@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaint Details - Complaint Desk</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>Complaint Desk</h2>
+      </div>
+
+      <div class="sidebar-section-title">WORKSPACE</div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="complaints.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <line x1="10" y1="9" x2="8" y2="9"></line>
+          </svg>
+          <span>Complaints</span>
+        </a>
+
+        <a href="notifications.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Notifications</span>
+        </a>
+
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="btn-logout" onclick="sessionStorage.clear(); window.location.href='../login.html';">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-title-block">
+          <a href="complaints.html" style="font-size:13px; color:var(--color-primary); font-weight:600; display:inline-flex; align-items:center; gap:4px; margin-bottom:4px;">
+            &larr; Back to Complaints
+          </a>
+          <h1 id="complaintTitleHeader">Complaint Details</h1>
+          <p id="complaintIdHeader">Loading ticket information...</p>
+        </div>
+
+        <div class="header-actions">
+          <button class="notification-bell-btn" title="Notifications" onclick="window.location.href='notifications.html';">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+
+          <div class="user-profile-capsule" title="Student Profile" onclick="window.location.href='settings.html';" style="cursor: pointer;">
+            <div class="avatar-circle">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="user-info">
+              <span class="user-name">Om</span>
+              <span class="user-role">STUDENT</span>
+            </div>
+            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content Area -->
+      <main class="page-content" id="detailsMainContent">
+        <div class="details-layout-grid">
+          <!-- Left Column: Core Complaint Details Card -->
+          <section class="section-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <span class="complaint-id-tag" id="fieldId" style="font-size:14px;">CMP-00000</span>
+                <h2 id="fieldTitle" style="font-size:20px; margin-top:4px;">Complaint Title</h2>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <span id="fieldPriorityBadge" class="badge-priority priority-medium">Medium</span>
+                <span id="fieldStatusBadge" class="status-badge badge-submitted">SUBMITTED</span>
+              </div>
+            </div>
+
+            <div class="form-grid-2" style="border-top:1px solid #f1f5f9; padding-top:18px;">
+              <div class="detail-field-group">
+                <div class="detail-label">Category</div>
+                <div class="detail-value" id="fieldCategory">-</div>
+              </div>
+
+              <div class="detail-field-group">
+                <div class="detail-label">Location / Classroom</div>
+                <div class="detail-value" id="fieldLocation">-</div>
+              </div>
+
+              <div class="detail-field-group">
+                <div class="detail-label">Submitted On</div>
+                <div class="detail-value" id="fieldSubmittedAt">-</div>
+              </div>
+
+              <div class="detail-field-group">
+                <div class="detail-label">Submitted By</div>
+                <div class="detail-value" id="fieldSubmittedBy">-</div>
+              </div>
+
+              <div class="detail-field-group form-group-full">
+                <div class="detail-label">Detailed Description</div>
+                <div class="detail-value" id="fieldDescription" style="background:#f8fafc; padding:14px; border-radius:6px; border:1px solid #f1f5f9; font-size:14px; line-height:1.6; white-space:pre-wrap;">-</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Right Column: Activity Timeline -->
+          <section class="section-card">
+            <div class="section-card-header">
+              <h2>Activity Timeline</h2>
+              <p style="font-size:12px; color:#64748b; margin-top:2px;">Complete audit trail of status updates and admin responses</p>
+            </div>
+
+            <div class="timeline-container" id="timelineList">
+              <!-- Dynamically populated from complaint.timeline -->
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/shared-data.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Parse ID from URL query: ?id=CMP-XXXXX
+      const urlParams = new URLSearchParams(window.location.search);
+      const complaintId = urlParams.get("id");
+
+      if (!complaintId) {
+        document.getElementById("detailsMainContent").innerHTML = `
+          <div class="section-card" style="text-align:center; padding:48px 24px;">
+            <h3>No Complaint ID Specified</h3>
+            <p style="color:#64748b; margin:10px 0 20px;">Please select a complaint from your complaints list.</p>
+            <a href="complaints.html" class="btn-report-complaint" style="display:inline-flex;">Go to Complaints List</a>
+          </div>
+        `;
+        return;
+      }
+
+      const complaint = ComplaintStore.getComplaintById(complaintId);
+
+      if (!complaint) {
+        document.getElementById("detailsMainContent").innerHTML = `
+          <div class="section-card" style="text-align:center; padding:48px 24px;">
+            <h3>Complaint Not Found</h3>
+            <p style="color:#64748b; margin:10px 0 20px;">Could not find ticket with ID <strong>${complaintId}</strong>.</p>
+            <a href="complaints.html" class="btn-report-complaint" style="display:inline-flex;">Back to Complaints</a>
+          </div>
+        `;
+        return;
+      }
+
+      // Populate Top Header
+      document.getElementById("complaintTitleHeader").textContent = complaint.title;
+      document.getElementById("complaintIdHeader").textContent = `${complaint.id} • Submitted on ${complaint.submittedAt}`;
+
+      // Populate Fields
+      document.getElementById("fieldId").textContent = complaint.id;
+      document.getElementById("fieldTitle").textContent = complaint.title;
+      document.getElementById("fieldCategory").textContent = complaint.category;
+      document.getElementById("fieldLocation").textContent = complaint.location || "Campus Premises";
+      document.getElementById("fieldSubmittedAt").textContent = complaint.submittedAt;
+      document.getElementById("fieldSubmittedBy").textContent = `${complaint.studentName} (${complaint.studentDept})`;
+      document.getElementById("fieldDescription").textContent = complaint.description;
+
+      // Badges
+      const statusBadge = document.getElementById("fieldStatusBadge");
+      statusBadge.textContent = complaint.status;
+      if (complaint.status === "RESOLVED" || complaint.status === "CLOSED") {
+        statusBadge.className = "status-badge badge-closed";
+      } else if (complaint.status === "IN PROGRESS" || complaint.status === "IN_PROGRESS") {
+        statusBadge.className = "status-badge badge-in-progress";
+      } else {
+        statusBadge.className = "status-badge badge-submitted";
+      }
+
+      const prioBadge = document.getElementById("fieldPriorityBadge");
+      prioBadge.textContent = complaint.priority;
+      const pLower = (complaint.priority || "").toLowerCase();
+      if (pLower === "low") prioBadge.className = "badge-priority priority-low";
+      else if (pLower === "high") prioBadge.className = "badge-priority priority-high";
+      else if (pLower === "urgent") prioBadge.className = "badge-priority priority-urgent";
+      else prioBadge.className = "badge-priority priority-medium";
+
+      // Populate Timeline
+      const timelineEl = document.getElementById("timelineList");
+      timelineEl.innerHTML = "";
+
+      const timeline = complaint.timeline || [];
+      timeline.forEach(item => {
+        let markerColor = "orange";
+        if (item.status === "RESOLVED" || item.status === "CLOSED") markerColor = "green";
+        else if (item.status === "IN PROGRESS" || item.status === "IN_PROGRESS") markerColor = "purple";
+
+        const div = document.createElement("div");
+        div.className = "timeline-item";
+        div.innerHTML = `
+          <div class="timeline-marker ${markerColor}"></div>
+          <div class="timeline-header">
+            <span class="timeline-title">${item.action}</span>
+            <span class="timeline-meta">${item.time}</span>
+          </div>
+          <div style="font-size:12px; color:#64748b; margin-bottom:4px;">By: <strong>${item.by}</strong></div>
+          ${item.note ? `<div class="timeline-body">${item.note}</div>` : ""}
+        `;
+        timelineEl.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>

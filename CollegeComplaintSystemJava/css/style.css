@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   College Complaint Management System - Core Style Tokens & Base Styles
+   ========================================================================== */
+
+:root {
+  /* Brand & Layout Palette */
+  --color-sidebar-bg: #111827;       /* Dark navy sidebar */
+  --color-sidebar-hover: #1f2937;
+  --color-sidebar-text: #94a3b8;    /* Muted slate text */
+  --color-sidebar-text-active: #ffffff;
+  
+  --color-bg-canvas: #f8fafc;       /* Light gray canvas background */
+  --color-card-bg: #ffffff;         /* Clean white card */
+  --color-border: #e2e8f0;          /* Subtle card & input border */
+  --color-border-light: #f1f5f9;
+  
+  /* Text Colors */
+  --color-text-main: #0f172a;       /* Dark charcoal headings/titles */
+  --color-text-muted: #64748b;      /* Slate secondary text */
+  --color-text-light: #94a3b8;      /* Captions and labels */
+  
+  /* Accent & Action Colors */
+  --color-primary: #10b981;         /* Emerald green primary accent */
+  --color-primary-hover: #059669;   /* Darker green hover state */
+  --color-primary-light: #d1fae5;   /* Light green for badges/avatars */
+  
+  /* Stat Card Accent Colors (matching screenshots) */
+  --color-stat-total: #3b82f6;      /* Blue accent */
+  --color-stat-pending: #f97316;    /* Orange accent */
+  --color-stat-progress: #8b5cf6;   /* Purple accent */
+  --color-stat-resolved: #10b981;   /* Emerald green accent */
+
+  /* Status Badge Colors */
+  --badge-submitted-bg: #ffedd5;
+  --badge-submitted-text: #ea580c;
+  --badge-progress-bg: #ede9fe;
+  --badge-progress-text: #7c3aed;
+  --badge-resolved-bg: #dcfce7;
+  --badge-resolved-text: #16a34a;
+  --badge-rejected-bg: #fee2e2;
+  --badge-rejected-text: #dc2626;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  
+  /* Shadows & Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.07);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-canvas);
+  color: var(--color-text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Universal & Action Buttons
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1;
+  text-decoration: none;
+  user-select: none;
+  letter-spacing: 0.015em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.btn svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+/* Green Primary Button (e.g. Update Status, Submit Complaint) */
+.btn-primary {
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: 1px solid #059669;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.25), 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, #059669 0%, #047857 100%);
+  border-color: #047857;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.38), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.985);
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:hover svg {
+  transform: scale(1.15);
+}
+
+/* Blue Action Button (e.g. Send Response) */
+.btn-blue {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  border: 1px solid #1d4ed8;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25), 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.btn-blue:hover {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #1e40af;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.38), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-blue:active {
+  transform: translateY(0) scale(0.985);
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.btn-blue:hover svg {
+  transform: translateX(3px) scale(1.1);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - Complaint Desk Admin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Left Sidebar (Admin Navigation) -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>Complaint Desk</h2>
+      </div>
+
+      <div class="sidebar-section-title">WORKSPACE</div>
+
+      <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- Complaints -->
+        <a href="complaints.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <line x1="10" y1="9" x2="8" y2="9"></line>
+          </svg>
+          <span>Complaints</span>
+        </a>
+
+        <!-- User Management (Active) -->
+        <a href="users.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>User Management</span>
+        </a>
+
+        <!-- Notifications -->
+        <a href="notifications.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Notifications</span>
+        </a>
+
+        <!-- Settings -->
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Bottom Logout -->
+      <div class="sidebar-footer">
+        <button type="button" class="btn-logout" onclick="sessionStorage.clear(); window.location.href='../login.html';">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-title-block">
+          <h1>User Management</h1>
+          <p>Directory of registered students and college staff accounts</p>
+        </div>
+
+        <div class="header-actions">
+          <!-- Notification Bell -->
+          <button class="notification-bell-btn" title="Notifications" onclick="window.location.href='notifications.html';">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+
+          <!-- Admin Profile Capsule -->
+          <div class="user-profile-capsule" title="Admin Profile" onclick="window.location.href='settings.html';" style="cursor: pointer;">
+            <div class="avatar-circle">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="user-info">
+              <span class="user-name">System Administrator</span>
+              <span class="user-role">ADMIN</span>
+            </div>
+            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content Area -->
+      <main class="page-content">
+        <!-- Section 1: User Directory Table -->
+        <section class="section-card">
+          <div class="section-card-header">
+            <h2>User Directory</h2>
+            <p style="font-size:12px; color:#64748b; margin-top:2px;">Select a student to inspect their registered complaints</p>
+          </div>
+
+          <!-- Filter Bar -->
+          <div class="filter-bar">
+            <div class="filter-group">
+              <input type="text" id="userSearchInput" class="search-input" placeholder="Search by name, email, or department...">
+              <select id="userRoleFilter" class="filter-select">
+                <option value="">All Roles</option>
+                <option value="STUDENT">Students Only</option>
+                <option value="ADMIN">Admins Only</option>
+              </select>
+              <select id="userDeptFilter" class="filter-select">
+                <option value="">All Departments</option>
+                <option value="Computer Science">Computer Science & Engineering</option>
+                <option value="Administration">College Administration</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Users Table -->
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>USER ID</th>
+                  <th>FULL NAME</th>
+                  <th>EMAIL</th>
+                  <th>DEPARTMENT</th>
+                  <th>ROLE</th>
+                  <th>COMPLAINTS</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <!-- Dynamically populated from ComplaintStore.getUsers() -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section 2: Selected Student's Complaints Inspector -->
+        <section class="section-card" id="studentComplaintsSection" style="margin-top:24px;">
+          <div class="section-card-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h2 id="inspectorHeading">Student Complaints Inspector</h2>
+              <p id="inspectorSubheading" style="font-size:12px; color:#64748b; margin-top:2px;">
+                Review grievances submitted by the selected student
+              </p>
+            </div>
+            <div id="inspectorStudentBadge" style="display:none;">
+              <span class="status-badge" style="background:#e0f2fe; color:#0369a1; font-weight:600;">SELECTED STUDENT</span>
+            </div>
+          </div>
+
+          <!-- Inspector Content Area -->
+          <div id="inspectorContent">
+            <!-- Dynamically populated when student is selected -->
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/shared-data.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchInput = document.getElementById("userSearchInput");
+      const roleFilter = document.getElementById("userRoleFilter");
+      const deptFilter = document.getElementById("userDeptFilter");
+      const tableBody = document.getElementById("usersTableBody");
+
+      let currentSelectedEmail = "student@test.com"; // Default to Om Sharma
+
+      function renderUsers() {
+        const users = ComplaintStore.getUsers();
+        const allComplaints = ComplaintStore.getAllComplaints();
+        const query = searchInput.value.toLowerCase().trim();
+        const selRole = roleFilter.value;
+        const selDept = deptFilter.value.toLowerCase();
+
+        const filtered = users.filter(u => {
+          const matchQuery = !query ||
+            u.name.toLowerCase().includes(query) ||
+            u.email.toLowerCase().includes(query) ||
+            u.dept.toLowerCase().includes(query) ||
+            u.id.toLowerCase().includes(query);
+
+          const matchRole = !selRole || u.role === selRole;
+          const matchDept = !selDept || u.dept.toLowerCase().includes(selDept);
+
+          return matchQuery && matchRole && matchDept;
+        });
+
+        tableBody.innerHTML = "";
+
+        if (filtered.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align:center; color:#64748b; padding:28px 16px;">
+                No users matching filters.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach(u => {
+          const userComplaints = allComplaints.filter(c => c.submittedBy === u.email);
+          const isSelected = u.email === currentSelectedEmail;
+
+          const tr = document.createElement("tr");
+          if (isSelected) {
+            tr.style.backgroundColor = "#f0fdf4";
+          }
+          if (u.role === "STUDENT") {
+            tr.style.cursor = "pointer";
+          }
+
+          let roleBadge = `<span class="status-badge" style="background:#e0f2fe; color:#0369a1;">STUDENT</span>`;
+          if (u.role === "ADMIN") {
+            roleBadge = `<span class="status-badge" style="background:#ede9fe; color:#6d28d9;">ADMIN</span>`;
+          }
+
+          let complaintsCountHtml = `<span style="font-size:12px; color:#94a3b8;">N/A (Staff)</span>`;
+          let actionBtnHtml = `<span style="font-size:12px; color:#94a3b8;">-</span>`;
+
+          if (u.role === "STUDENT") {
+            complaintsCountHtml = `<span class="badge-priority ${userComplaints.length > 0 ? 'priority-medium' : 'priority-low'}">${userComplaints.length} Complaint${userComplaints.length === 1 ? '' : 's'}</span>`;
+            actionBtnHtml = `
+              <button type="button" class="btn-sm-action ${isSelected ? 'active-select' : ''}" style="${isSelected ? 'background:#10b981; color:#fff; border-color:#10b981;' : ''}">
+                ${isSelected ? 'Selected &#10003;' : 'View Complaints &rarr;'}
+              </button>
+            `;
+          }
+
+          tr.innerHTML = `
+            <td><span class="complaint-id-tag">${u.id}</span></td>
+            <td><strong>${u.name}</strong></td>
+            <td>${u.email}</td>
+            <td>${u.dept}</td>
+            <td>${roleBadge}</td>
+            <td>${complaintsCountHtml}</td>
+            <td>${actionBtnHtml}</td>
+          `;
+
+          if (u.role === "STUDENT") {
+            tr.addEventListener("click", () => {
+              currentSelectedEmail = u.email;
+              renderUsers();
+              inspectStudent(u);
+              document.getElementById("studentComplaintsSection").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+          }
+
+          tableBody.appendChild(tr);
+        });
+      }
+
+      function inspectStudent(student) {
+        const inspectorEl = document.getElementById("inspectorContent");
+        const badgeEl = document.getElementById("inspectorStudentBadge");
+        badgeEl.style.display = "block";
+
+        const complaints = ComplaintStore.getStudentComplaints(student.email);
+
+        if (complaints.length === 0) {
+          inspectorEl.innerHTML = `
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:24px; text-align:center;">
+              <div style="font-size:16px; font-weight:600; color:#0f172a; margin-bottom:6px;">${student.name} (${student.email})</div>
+              <div style="font-size:13px; color:#64748b; margin-bottom:16px;">Department: ${student.dept}</div>
+              <p style="color:#64748b; font-size:14px;">This student has not submitted any complaints yet.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Student has 1 or multiple complaints
+        let dropdownHtml = "";
+        if (complaints.length > 1) {
+          dropdownHtml = `
+            <div style="margin-bottom:20px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:14px 18px;">
+              <label for="studentComplaintSelect" style="display:block; font-size:12px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px; letter-spacing:0.04em;">
+                Select Complaint (${complaints.length} Complaints on record):
+              </label>
+              <select id="studentComplaintSelect" class="filter-select" style="width:100%; height:42px; font-weight:500; font-size:14px; background-color:#ffffff;">
+                ${complaints.map((c, idx) => `
+                  <option value="${c.id}">${c.id} &mdash; ${c.title} [${c.status}]</option>
+                `).join('')}
+              </select>
+            </div>
+          `;
+        }
+
+        inspectorEl.innerHTML = `
+          <!-- Student Info Header Strip -->
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px 20px; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div style="font-size:16px; font-weight:700; color:#0f172a;">${student.name}</div>
+              <div style="font-size:13px; color:#64748b; margin-top:2px;">${student.email} &bull; ${student.dept}</div>
+            </div>
+            <div>
+              <span class="badge-priority priority-medium" style="font-size:12px; padding:4px 12px;">
+                ${complaints.length} Total Complaint${complaints.length === 1 ? '' : 's'}
+              </span>
+            </div>
+          </div>
+
+          ${dropdownHtml}
+
+          <!-- Display Container for the Selected Single Complaint -->
+          <div id="singleComplaintDisplay"></div>
+        `;
+
+        function renderSelectedComplaint(complaintId) {
+          const complaint = complaints.find(c => c.id === complaintId) || complaints[0];
+          const displayEl = document.getElementById("singleComplaintDisplay");
+          if (!displayEl) return;
+
+          let badgeClass = "badge-submitted";
+          if (complaint.status === "RESOLVED" || complaint.status === "CLOSED") badgeClass = "badge-closed";
+          else if (complaint.status === "IN PROGRESS" || complaint.status === "IN_PROGRESS") badgeClass = "badge-in-progress";
+
+          let prioClass = "priority-medium";
+          const pLower = (complaint.priority || "").toLowerCase();
+          if (pLower === "low") prioClass = "priority-low";
+          else if (pLower === "high") prioClass = "priority-high";
+          else if (pLower === "urgent") prioClass = "priority-urgent";
+
+          displayEl.innerHTML = `
+            <div style="border:1px solid #e2e8f0; border-radius:8px; padding:22px; background:#ffffff; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                <div>
+                  <span class="complaint-id-tag" style="font-size:13px;">${complaint.id}</span>
+                  <h3 style="font-size:18px; margin-top:4px; color:#0f172a;">${complaint.title}</h3>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <span class="badge-priority ${prioClass}">${complaint.priority || 'Medium'}</span>
+                  <span class="status-badge ${badgeClass}">${complaint.status}</span>
+                </div>
+              </div>
+
+              <div class="form-grid-2" style="border-top:1px solid #f1f5f9; padding-top:14px; margin-bottom:14px;">
+                <div class="detail-field-group">
+                  <div class="detail-label">Category</div>
+                  <div class="detail-value" style="font-size:14px;">${complaint.category}</div>
+                </div>
+                <div class="detail-field-group">
+                  <div class="detail-label">Location / Classroom</div>
+                  <div class="detail-value" style="font-size:14px;">${complaint.location}</div>
+                </div>
+                <div class="detail-field-group">
+                  <div class="detail-label">Submitted At</div>
+                  <div class="detail-value" style="font-size:14px;">${complaint.submittedAt}</div>
+                </div>
+                <div class="detail-field-group">
+                  <div class="detail-label">Current Lifecycle State</div>
+                  <div class="detail-value" style="font-size:14px;">${complaint.status}</div>
+                </div>
+                <div class="detail-field-group form-group-full">
+                  <div class="detail-label">Complaint Description</div>
+                  <div class="detail-value" style="background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #f1f5f9; font-size:14px; line-height:1.5;">${complaint.description}</div>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid #f1f5f9; padding-top:16px;">
+                <a href="complaint-details.html?id=${complaint.id}" class="btn-report-complaint" style="text-decoration:none;">
+                  Manage Complaint &rarr;
+                </a>
+              </div>
+            </div>
+          `;
+        }
+
+        // Initially render first complaint
+        renderSelectedComplaint(complaints[0].id);
+
+        // Attach dropdown listener if dropdown exists
+        const selectEl = document.getElementById("studentComplaintSelect");
+        if (selectEl) {
+          selectEl.addEventListener("change", function () {
+            renderSelectedComplaint(this.value);
+          });
+        }
+      }
+
+      searchInput.addEventListener("input", renderUsers);
+      roleFilter.addEventListener("change", renderUsers);
+      deptFilter.addEventListener("change", renderUsers);
+
+      // Initial load
+      renderUsers();
+      const initialStudent = ComplaintStore.getUsers().find(u => u.email === currentSelectedEmail);
+      if (initialStudent) {
+        inspectStudent(initialStudent);
+      }
+    });
+  </script>
+</body>
+</html>

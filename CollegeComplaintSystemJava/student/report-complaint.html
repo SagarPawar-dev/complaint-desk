@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Complaint - Complaint Desk</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>Complaint Desk</h2>
+      </div>
+
+      <div class="sidebar-section-title">WORKSPACE</div>
+
+      <nav class="sidebar-nav">
+        <!-- Dashboard -->
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- Complaints -->
+        <a href="complaints.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <line x1="10" y1="9" x2="8" y2="9"></line>
+          </svg>
+          <span>Complaints</span>
+        </a>
+
+        <!-- Notifications -->
+        <a href="notifications.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Notifications</span>
+        </a>
+
+        <!-- Settings -->
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Bottom Logout -->
+      <div class="sidebar-footer">
+        <button type="button" class="btn-logout" onclick="sessionStorage.clear(); window.location.href='../login.html';">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-title-block">
+          <h1>Report Complaint</h1>
+          <p>Submit a new grievance or maintenance request</p>
+        </div>
+
+        <div class="header-actions">
+          <!-- Notification Bell -->
+          <button class="notification-bell-btn" title="Notifications" onclick="window.location.href='notifications.html';">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-badge">2</span>
+          </button>
+
+          <!-- User Profile Capsule -->
+          <div class="user-profile-capsule" title="Student Profile" onclick="window.location.href='settings.html';" style="cursor: pointer;">
+            <div class="avatar-circle">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="user-info">
+              <span class="user-name">Om</span>
+              <span class="user-role">STUDENT</span>
+            </div>
+            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content Area -->
+      <main class="page-content">
+        <section class="section-card" style="max-width: 760px;">
+          <div class="section-card-header">
+            <h2>Complaint Information</h2>
+          </div>
+
+          <!-- Success Alert Banner (hidden by default) -->
+          <div id="successAlert" class="alert-banner alert-success" style="display: none;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <div style="flex: 1;">
+              <strong>Complaint Submitted Successfully!</strong>
+              <div id="successMessageDetail" style="margin-top: 2px;">Your ticket has been recorded.</div>
+            </div>
+            <a href="complaints.html" class="btn-sm-action" style="background:#ffffff; color:#065f46; font-weight:600;">
+              View in Complaints &rarr;
+            </a>
+          </div>
+
+          <form id="reportComplaintForm">
+            <div class="form-grid-2">
+              <!-- Title -->
+              <div class="form-group form-group-full">
+                <label for="complaintTitle" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:8px;">
+                  Complaint Title *
+                </label>
+                <input type="text" id="complaintTitle" class="search-input" style="width:100%;" placeholder="e.g. Water cooler leaking on 2nd floor" required>
+              </div>
+
+              <!-- Category -->
+              <div class="form-group">
+                <label for="complaintCategory" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:8px;">
+                  Category *
+                </label>
+                <select id="complaintCategory" class="filter-select" style="width:100%;" required>
+                  <option value="">Select a category...</option>
+                  <option value="Electrical">Electrical (Fans, Lights, Switches)</option>
+                  <option value="IT / Equipment">IT & Classroom Equipment (Projectors, Wi-Fi)</option>
+                  <option value="Infrastructure">Infrastructure (Plumbing, Benches, Washrooms)</option>
+                  <option value="Hostel">Hostel Facilities</option>
+                  <option value="Other">Other Issues</option>
+                </select>
+              </div>
+
+              <!-- Priority -->
+              <div class="form-group">
+                <label for="complaintPriority" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:8px;">
+                  Priority Level *
+                </label>
+                <select id="complaintPriority" class="filter-select" style="width:100%;" required>
+                  <option value="Low">Low - Minor inconvenience</option>
+                  <option value="Medium" selected>Medium - Normal issue</option>
+                  <option value="High">High - Impedes classes/study</option>
+                  <option value="Urgent">Urgent - Safety or immediate emergency</option>
+                </select>
+              </div>
+
+              <!-- Location -->
+              <div class="form-group form-group-full">
+                <label for="complaintLocation" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:8px;">
+                  Specific Location / Classroom *
+                </label>
+                <input type="text" id="complaintLocation" class="search-input" style="width:100%;" placeholder="e.g. Block B, Room 204 or Main Library 1st Floor" required>
+              </div>
+
+              <!-- Detailed Description -->
+              <div class="form-group form-group-full">
+                <label for="complaintDescription" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:8px;">
+                  Detailed Description *
+                </label>
+                <textarea id="complaintDescription" class="form-textarea" placeholder="Please describe the exact issue, symptoms, and any other relevant details..." required></textarea>
+              </div>
+            </div>
+
+            <div class="form-actions-row">
+              <a href="dashboard.html" class="btn-secondary">Cancel</a>
+              <button type="submit" class="btn-report-complaint" style="border:none;">
+                Submit Complaint
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/shared-data.js"></script>
+  <script>
+    document.getElementById("reportComplaintForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const title = document.getElementById("complaintTitle").value.trim();
+      const category = document.getElementById("complaintCategory").value;
+      const priority = document.getElementById("complaintPriority").value;
+      const location = document.getElementById("complaintLocation").value.trim();
+      const description = document.getElementById("complaintDescription").value.trim();
+
+      if (!title || !category || !location || !description) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      // Read current logged in student info from sessionStorage if available
+      let studentEmail = "student@test.com";
+      let studentName = "Om Sharma";
+      try {
+        const user = JSON.parse(sessionStorage.getItem("demoUser"));
+        if (user && user.email) {
+          studentEmail = user.email;
+          studentName = user.name || studentName;
+        }
+      } catch (err) {}
+
+      // Save via shared data module
+      const created = ComplaintStore.createComplaint({
+        title: title,
+        category: category,
+        priority: priority,
+        location: location,
+        description: description,
+        submittedBy: studentEmail,
+        studentName: studentName
+      });
+
+      // Show success alert
+      const alertBox = document.getElementById("successAlert");
+      document.getElementById("successMessageDetail").innerHTML =
+        `Complaint ID <strong>${created.id}</strong> has been filed and notified to the administrator.`;
+      alertBox.style.display = "flex";
+
+      // Reset form
+      document.getElementById("reportComplaintForm").reset();
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

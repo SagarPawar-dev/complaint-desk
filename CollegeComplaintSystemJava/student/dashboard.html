@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - Complaint Desk</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>Complaint Desk</h2>
+      </div>
+
+      <div class="sidebar-section-title">WORKSPACE</div>
+
+      <nav class="sidebar-nav">
+        <!-- Dashboard (Active) -->
+        <a href="dashboard.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- Complaints -->
+        <a href="complaints.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <line x1="10" y1="9" x2="8" y2="9"></line>
+          </svg>
+          <span>Complaints</span>
+        </a>
+
+        <!-- Notifications -->
+        <a href="notifications.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Notifications</span>
+        </a>
+
+        <!-- Settings -->
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Bottom Logout -->
+      <div class="sidebar-footer">
+        <button type="button" class="btn-logout" id="btnLogout" onclick="sessionStorage.clear(); window.location.href='../login.html';">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-title-block">
+          <h1>Dashboard</h1>
+          <p>Complaint tracking overview</p>
+        </div>
+
+        <div class="header-actions">
+          <!-- Notification Bell -->
+          <button class="notification-bell-btn" title="Notifications" onclick="window.location.href='notifications.html';">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-badge">2</span>
+          </button>
+
+          <!-- User Profile Capsule -->
+          <div class="user-profile-capsule" title="Student Profile" onclick="window.location.href='settings.html';" style="cursor: pointer;">
+            <div class="avatar-circle">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="user-info">
+              <span class="user-name" id="userNameDisplay">Om</span>
+              <span class="user-role">STUDENT</span>
+            </div>
+            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content Area -->
+      <main class="page-content">
+        <!-- Action Row: Report Complaint Button -->
+        <div class="action-banner-row">
+          <a href="report-complaint.html" class="btn-report-complaint">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            <span>Report Complaint</span>
+          </a>
+        </div>
+
+        <!-- Four Statistic Cards Grid -->
+        <section class="stats-grid">
+          <!-- Total Complaints -->
+          <div class="stat-card card-total">
+            <div class="stat-card-title">TOTAL COMPLAINTS</div>
+            <div class="stat-card-value" id="statTotal">0</div>
+            <div class="stat-card-desc">All recorded complaints</div>
+          </div>
+
+          <!-- Pending -->
+          <div class="stat-card card-pending">
+            <div class="stat-card-title">PENDING</div>
+            <div class="stat-card-value" id="statPending">0</div>
+            <div class="stat-card-desc">Awaiting action</div>
+          </div>
+
+          <!-- In Progress -->
+          <div class="stat-card card-progress">
+            <div class="stat-card-title">IN PROGRESS</div>
+            <div class="stat-card-value" id="statProgress">0</div>
+            <div class="stat-card-desc">Currently being handled</div>
+          </div>
+
+          <!-- Resolved -->
+          <div class="stat-card card-resolved">
+            <div class="stat-card-title">RESOLVED</div>
+            <div class="stat-card-value" id="statResolved">0</div>
+            <div class="stat-card-desc">Successfully closed</div>
+          </div>
+        </section>
+
+        <!-- Recent Activity Section -->
+        <section class="section-card">
+          <div class="section-card-header">
+            <h2>Recent Activity</h2>
+          </div>
+
+          <div class="activity-list" id="recentActivityList">
+            <!-- Dynamically populated from ComplaintStore -->
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/shared-data.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let studentEmail = "student@test.com";
+      try {
+        const demoUser = JSON.parse(sessionStorage.getItem("demoUser"));
+        if (demoUser && demoUser.name) {
+          document.getElementById("userNameDisplay").textContent = demoUser.name;
+        }
+        if (demoUser && demoUser.email) {
+          studentEmail = demoUser.email;
+        }
+      } catch (e) {}
+
+      // Update Stats
+      const stats = ComplaintStore.getStats(studentEmail);
+      document.getElementById("statTotal").textContent = stats.total;
+      document.getElementById("statPending").textContent = stats.pending;
+      document.getElementById("statProgress").textContent = stats.progress;
+      document.getElementById("statResolved").textContent = stats.resolved;
+
+      // Update Notification Badge
+      const notifs = ComplaintStore.getNotifications("STUDENT", studentEmail);
+      const badge = document.querySelector(".notification-badge");
+      if (badge) {
+        badge.textContent = notifs.length;
+        if (notifs.length === 0) badge.style.display = "none";
+      }
+
+      // Populate Recent Activity
+      const complaints = ComplaintStore.getStudentComplaints(studentEmail);
+      const listEl = document.getElementById("recentActivityList");
+      listEl.innerHTML = "";
+
+      if (complaints.length === 0) {
+        listEl.innerHTML = '<p style="color:#64748b; font-size:14px; padding:10px 0;">No complaints recorded yet.</p>';
+        return;
+      }
+
+      // Show top 5 recent
+      complaints.slice(0, 5).forEach(c => {
+        let badgeClass = "badge-submitted";
+        let statusLabel = c.status;
+        if (c.status === "RESOLVED" || c.status === "CLOSED") {
+          badgeClass = "badge-closed";
+        } else if (c.status === "IN PROGRESS" || c.status === "IN_PROGRESS") {
+          badgeClass = "badge-in-progress";
+        }
+
+        const item = document.createElement("div");
+        item.className = "activity-item";
+        item.style.cursor = "pointer";
+        item.title = "Click to view complaint details";
+        item.innerHTML = `
+          <div class="activity-info">
+            <h3>${c.title}</h3>
+            <div class="activity-meta">${c.id} &bull; ${c.submittedAt}</div>
+          </div>
+          <span class="status-badge ${badgeClass}">${statusLabel}</span>
+        `;
+        item.addEventListener("click", () => {
+          window.location.href = `complaint-details.html?id=${c.id}`;
+        });
+        listEl.appendChild(item);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Complaint Desk</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-header">
+    <h1>Complaint Desk</h1>
+    <p>Login to manage complaints</p>
+  </div>
+
+  <div class="auth-card">
+    <div id="loginError" class="auth-error"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">EMAIL</label>
+        <input type="email" id="email" name="email" class="form-control" required autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="password">PASSWORD</label>
+        <input type="password" id="password" name="password" class="form-control" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn-primary" id="btnSignIn">Sign In</button>
+    </form>
+  </div>
+
+  <script>
+    // ========================================================================
+    // DEMO-ONLY MOCK LOGIN LOGIC (Phases 1 & 2)
+    // NOTE: In Phase 3, this will be replaced with real server-side authentication
+    // using Java Servlets, secure sessions (HttpSession), and Supabase PostgreSQL.
+    // ========================================================================
+    const MOCK_CREDENTIALS = {
+      "student@test.com": {
+        password: "student123",
+        role: "STUDENT",
+        name: "Om",
+        redirectUrl: "student/dashboard.html"
+      },
+      "admin@test.com": {
+        password: "admin123",
+        role: "ADMIN",
+        name: "System Administrator",
+        redirectUrl: "admin/dashboard.html"
+      }
+    };
+
+    const loginForm = document.getElementById("loginForm");
+    const loginError = document.getElementById("loginError");
+
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      loginError.style.display = "none";
+
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+
+      const user = MOCK_CREDENTIALS[email];
+
+      if (user && user.password === password) {
+        // Save demo session for local UI testing
+        sessionStorage.setItem("demoUser", JSON.stringify({
+          email: email,
+          role: user.role,
+          name: user.name
+        }));
+
+        // Navigate to the respective dashboard
+        window.location.href = user.redirectUrl;
+      } else {
+        loginError.textContent = "Invalid credentials. Demo accounts: student@test.com (pass: student123) or admin@test.com (pass: admin123)";
+        loginError.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
