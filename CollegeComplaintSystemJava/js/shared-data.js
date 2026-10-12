@@ -100,6 +100,17 @@ const DEFAULT_NOTIFICATIONS = [
     time: "05/10/2026 10:30 AM",
     type: "NEW_SUBMISSION",
     read: false
+  },
+  {
+    id: "NOTIF-003",
+    complaintId: "CMP-00002",
+    recipientEmail: "student@test.com",
+    recipientRole: "STUDENT",
+    title: "Complaint Under Review (CMP-00002)",
+    message: "Admin started reviewing 'fan not working' in Library 1st Floor.",
+    time: "05/10/2026 10:35 AM",
+    type: "PENDING",
+    read: false
   }
 ];
 
@@ -116,6 +127,20 @@ function initStorage() {
   }
   if (!localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS)) {
     localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(DEFAULT_NOTIFICATIONS));
+  } else {
+    try {
+      const notifs = JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS));
+      let changed = false;
+      notifs.forEach(n => {
+        if (typeof n.read !== "boolean") {
+          n.read = false;
+          changed = true;
+        }
+      });
+      if (changed) {
+        localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+      }
+    } catch (e) {}
   }
 }
 
@@ -279,10 +304,61 @@ const ComplaintStore = {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
       const all = data ? JSON.parse(data) : DEFAULT_NOTIFICATIONS;
-      return all.filter(n => n.recipientRole === role || n.recipientEmail === email);
+      if (role === "ADMIN") {
+        return all.filter(n => n.recipientRole === "ADMIN");
+      }
+      return all.filter(n => n.recipientRole === "STUDENT" && (!email || n.recipientEmail === email));
     } catch (e) {
       return [];
     }
+  },
+
+  getUnreadCount: function (role, email) {
+    const list = this.getNotifications(role, email);
+    return list.filter(n => !n.read).length;
+  },
+
+  markNotificationAsRead: function (id) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+      const all = data ? JSON.parse(data) : DEFAULT_NOTIFICATIONS;
+      const index = all.findIndex(n => n.id === id);
+      if (index !== -1) {
+        all[index].read = true;
+        localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(all));
+        return all[index];
+      }
+    } catch (e) {}
+    return null;
+  },
+
+  markAllNotificationsAsRead: function (role, email) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+      const all = data ? JSON.parse(data) : DEFAULT_NOTIFICATIONS;
+      all.forEach(n => {
+        if (role === "ADMIN" && n.recipientRole === "ADMIN") {
+          n.read = true;
+        } else if (role === "STUDENT" && n.recipientRole === "STUDENT" && (!email || n.recipientEmail === email)) {
+          n.read = true;
+        }
+      });
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(all));
+    } catch (e) {}
+  },
+
+  updateBellBadge: function (role, email) {
+    const count = this.getUnreadCount(role, email);
+    const badges = document.querySelectorAll(".notification-badge");
+    badges.forEach(badge => {
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = "flex";
+      } else {
+        badge.textContent = "0";
+        badge.style.display = "none";
+      }
+    });
   },
 
   addNotification: function (notif) {
@@ -305,3 +381,33 @@ const ComplaintStore = {
     return { total, pending, progress, resolved };
   }
 };
+
+// Auto-initialize Bell Badge across all pages
+if (typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", function () {
+    const path = (window.location.pathname || "").toLowerCase();
+    const isAdmin = path.includes("/admin/");
+    let role = isAdmin ? "ADMIN" : "STUDENT";
+    let email = isAdmin ? "admin@test.com" : "student@test.com";
+    try {
+      const demoUser = JSON.parse(sessionStorage.getItem("demoUser"));
+      if (demoUser && demoUser.email) {
+        email = demoUser.email;
+        if (demoUser.role) role = demoUser.role;
+      }
+    } catch (e) {}
+
+    // Ensure all bell buttons have a badge element attached
+    const bellBtns = document.querySelectorAll(".notification-bell-btn");
+    bellBtns.forEach(btn => {
+      if (!btn.querySelector(".notification-badge")) {
+        const badge = document.createElement("span");
+        badge.className = "notification-badge";
+        badge.style.display = "none";
+        btn.appendChild(badge);
+      }
+    });
+
+    ComplaintStore.updateBellBadge(role, email);
+  });
+}

@@ -125,9 +125,19 @@
       <!-- Page Content Area -->
       <main class="page-content">
         <section class="section-card" style="max-width: 800px;">
-          <div class="section-card-header">
-            <h2>Admin Notification Inbox</h2>
-            <p style="font-size:12px; color:#64748b; margin-top:2px;">Alerts on new student submissions and lifecycle changes</p>
+          <div class="section-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h2>Admin Notification Inbox</h2>
+              <p style="font-size:12px; color:#64748b; margin-top:2px;">Alerts on new student submissions and lifecycle changes</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span id="adminUnreadCounterBadge" class="badge-priority priority-high" style="display:none; background:#fee2e2; color:#ef4444; font-size:11px; padding:4px 10px;">
+                0 UNREAD
+              </span>
+              <button id="adminMarkAllReadBtn" class="btn-sm-action" style="font-size:12px; display:none;">
+                Mark all as read
+              </button>
+            </div>
           </div>
 
           <div id="adminNotificationsContainer">
@@ -141,47 +151,92 @@
   <script src="../js/shared-data.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const notifs = ComplaintStore.getNotifications("ADMIN", "admin@test.com");
       const container = document.getElementById("adminNotificationsContainer");
-      container.innerHTML = "";
+      const unreadBadgeEl = document.getElementById("adminUnreadCounterBadge");
+      const markAllBtn = document.getElementById("adminMarkAllReadBtn");
 
-      if (notifs.length === 0) {
-        container.innerHTML = '<p style="color:#64748b; padding:20px 0;">No admin notifications currently.</p>';
-        return;
+      function renderAdminNotifications() {
+        const notifs = ComplaintStore.getNotifications("ADMIN", "admin@test.com");
+        const unreadCount = ComplaintStore.getUnreadCount("ADMIN", "admin@test.com");
+
+        // Update page unread counter and Mark All button
+        if (unreadCount > 0) {
+          unreadBadgeEl.textContent = `${unreadCount} UNREAD`;
+          unreadBadgeEl.style.display = "inline-flex";
+          markAllBtn.style.display = "inline-flex";
+        } else {
+          unreadBadgeEl.style.display = "none";
+          markAllBtn.style.display = "none";
+        }
+
+        // Update top header bell badge
+        ComplaintStore.updateBellBadge("ADMIN", "admin@test.com");
+
+        container.innerHTML = "";
+
+        if (notifs.length === 0) {
+          container.innerHTML = '<p style="color:#64748b; padding:24px 0; text-align:center;">No admin notifications currently.</p>';
+          return;
+        }
+
+        notifs.forEach(n => {
+          let iconColor = "orange";
+          if (n.type === "RESOLVED" || n.type === "CLOSED") iconColor = "green";
+          else if (n.type === "RESPONSE") iconColor = "blue";
+
+          const isUnread = !n.read;
+          const card = document.createElement("div");
+          card.className = `notification-card-item ${isUnread ? 'unread' : 'read'}`;
+          card.style.cursor = "pointer";
+          card.title = `Click to manage ${n.complaintId || 'complaint'}`;
+
+          const statusPill = isUnread 
+            ? `<span class="badge-priority priority-high" style="background:#fee2e2; color:#ef4444; font-size:10px;">UNREAD</span>`
+            : `<span class="badge-priority priority-low" style="font-size:10px; color:#94a3b8;">READ</span>`;
+
+          card.innerHTML = `
+            <div class="notification-icon-wrap ${iconColor}">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div class="notification-content" style="flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px;">
+                <h4 style="font-size:14px; margin:0; display:flex; align-items:center;">
+                  ${n.title}
+                  ${isUnread ? '<span class="notification-unread-dot" title="Unread"></span>' : ''}
+                </h4>
+                ${statusPill}
+              </div>
+              <p style="margin:2px 0 6px;">${n.message}</p>
+              <span class="time-stamp">${n.time} &bull; <span style="color:var(--color-primary); font-weight:600;">Manage Ticket &rarr;</span></span>
+            </div>
+          `;
+
+          card.addEventListener("click", () => {
+            if (!n.read) {
+              ComplaintStore.markNotificationAsRead(n.id);
+              ComplaintStore.updateBellBadge("ADMIN", "admin@test.com");
+            }
+            if (n.complaintId) {
+              window.location.href = `complaint-details.html?id=${n.complaintId}`;
+            } else {
+              renderAdminNotifications();
+            }
+          });
+
+          container.appendChild(card);
+        });
       }
 
-      notifs.forEach(n => {
-        let iconColor = "orange";
-        if (n.type === "RESOLVED" || n.type === "CLOSED") iconColor = "green";
-        else if (n.type === "RESPONSE") iconColor = "blue";
-
-        const card = document.createElement("div");
-        card.className = "notification-card-item";
-        card.style.cursor = "pointer";
-        card.title = `Click to manage ${n.complaintId || 'complaint'}`;
-        card.innerHTML = `
-          <div class="notification-icon-wrap ${iconColor}">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-          </div>
-          <div class="notification-content" style="flex:1;">
-            <h4>${n.title}</h4>
-            <p>${n.message}</p>
-            <span class="time-stamp">${n.time} &bull; <span style="color:var(--color-primary); font-weight:600;">Manage Ticket &rarr;</span></span>
-          </div>
-        `;
-
-        card.addEventListener("click", () => {
-          if (n.complaintId) {
-            window.location.href = `complaint-details.html?id=${n.complaintId}`;
-          }
-        });
-
-        container.appendChild(card);
+      markAllBtn.addEventListener("click", () => {
+        ComplaintStore.markAllNotificationsAsRead("ADMIN", "admin@test.com");
+        renderAdminNotifications();
       });
+
+      renderAdminNotifications();
     });
   </script>
 </body>
