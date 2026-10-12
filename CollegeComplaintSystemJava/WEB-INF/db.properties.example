@@ -1,0 +1,11 @@
+# ==============================================================================
+# Supabase PostgreSQL Database Configuration (Template)
+# ==============================================================================
+# Copy this file to 'db.properties' and fill in your Supabase connection parameters.
+# 'db.properties' is ignored by Git to protect your database credentials.
+# ==============================================================================
+
+db.driver=org.postgresql.Driver
+db.url=jdbc:postgresql://YOUR_SUPABASE_HOST:5432/postgres?sslmode=require
+db.user=YOUR_SUPABASE_DB_USER
+db.password=YOUR_SUPABASE_DB_PASSWORD

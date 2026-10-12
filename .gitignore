@@ -6,6 +6,19 @@ Thumbs.db
 .vscode/
 .idea/
 *.iml
+.project
+.classpath
+.settings/
 
 # Logs & Temp
 *.log
+
+# Database Secrets & Configs
+**/db.properties
+db.properties
+*.env
+
+# Compiled Java Classes & Packages
+**/WEB-INF/classes/
+*.class
+*.war
