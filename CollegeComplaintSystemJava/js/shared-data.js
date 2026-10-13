@@ -379,12 +379,59 @@ const ComplaintStore = {
     const progress = list.filter(c => c.status === "IN PROGRESS" || c.status === "IN_PROGRESS").length;
     const resolved = list.filter(c => c.status === "RESOLVED" || c.status === "CLOSED").length;
     return { total, pending, progress, resolved };
+  },
+
+  /**
+   * Client-side session verification (defense-in-depth).
+   * Validates server-side session with /api/login and redirects unauthenticated users.
+   */
+  verifySession: async function () {
+    const path = (window.location.pathname || "").toLowerCase();
+    const isAdmin = path.includes("/admin/");
+    const isStudent = path.includes("/student/");
+    if (!isAdmin && !isStudent) return;
+
+    if (window.location.protocol.startsWith("http")) {
+      try {
+        const res = await fetch("../api/login", { credentials: "same-origin" });
+        if (res.ok) {
+          const data = await res.json();
+          if (!data || !data.authenticated) {
+            window.location.replace("../login.html");
+            return;
+          }
+          if (isAdmin && data.role !== "ADMIN") {
+            window.location.replace("../student/dashboard.html");
+            return;
+          }
+          if (isStudent && data.role !== "STUDENT") {
+            window.location.replace("../admin/dashboard.html");
+            return;
+          }
+        }
+      } catch (e) {
+        // Fallback for standalone demo mode
+      }
+    }
+  },
+
+  logout: async function () {
+    try {
+      sessionStorage.clear();
+      await fetch("../api/logout", {
+        method: "POST",
+        headers: { "Accept": "application/json" }
+      });
+    } catch (e) {}
+    window.location.href = "../login.html";
   }
 };
 
-// Auto-initialize Bell Badge across all pages
+// Auto-initialize Bell Badge and Session Verification across all pages
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", function () {
+    ComplaintStore.verifySession();
+
     const path = (window.location.pathname || "").toLowerCase();
     const isAdmin = path.includes("/admin/");
     let role = isAdmin ? "ADMIN" : "STUDENT";

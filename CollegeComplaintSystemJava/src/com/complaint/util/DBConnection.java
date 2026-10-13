@@ -50,7 +50,25 @@ public class DBConnection {
                 input = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties");
             }
 
-            // 2. Fallback: Search common file paths for standalone main() execution
+            // 2. Try locating WEB-INF/db.properties relative to compiled class location (Tomcat WebApp)
+            if (input == null) {
+                try {
+                    java.net.URL location = DBConnection.class.getProtectionDomain().getCodeSource().getLocation();
+                    if (location != null) {
+                        File base = new File(location.toURI());
+                        File parent = base.isDirectory() ? base.getParentFile() : base.getParentFile().getParentFile();
+                        if (parent != null) {
+                            File candidate = new File(parent, "db.properties");
+                            if (candidate.exists() && candidate.isFile()) {
+                                input = new FileInputStream(candidate);
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+            // 3. Fallback: Search common file paths for standalone main() execution
             if (input == null) {
                 String[] candidatePaths = {
                     "WEB-INF/db.properties",

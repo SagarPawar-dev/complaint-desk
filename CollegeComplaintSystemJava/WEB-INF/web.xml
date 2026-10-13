@@ -12,4 +12,68 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
+    <!-- Session Timeout (30 minutes) -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <name>JSESSIONID</name>
+        </cookie-config>
+    </session-config>
+
+    <!-- 1. Authentication Filter: Requires user to be logged in for /student/* and /admin/* -->
+    <filter>
+        <filter-name>AuthenticationFilter</filter-name>
+        <filter-class>com.complaint.filter.AuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/student/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <!-- 2. Role Authorization Filter: Enforces role isolation (Student vs Admin) -->
+    <filter>
+        <filter-name>RoleAuthorizationFilter</filter-name>
+        <filter-class>com.complaint.filter.RoleAuthorizationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>RoleAuthorizationFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>RoleAuthorizationFilter</filter-name>
+        <url-pattern>/student/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <!-- Servlets -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.complaint.servlet.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/api/login</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>com.complaint.servlet.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/api/logout</url-pattern>
+    </servlet-mapping>
+
 </web-app>

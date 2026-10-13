@@ -33,51 +33,87 @@
   </div>
 
   <script>
-    // ========================================================================
-    // DEMO-ONLY MOCK LOGIN LOGIC (Phases 1 & 2)
-    // NOTE: In Phase 3, this will be replaced with real server-side authentication
-    // using Java Servlets, secure sessions (HttpSession), and Supabase PostgreSQL.
-    // ========================================================================
-    const MOCK_CREDENTIALS = {
-      "student@test.com": {
-        password: "student123",
-        role: "STUDENT",
-        name: "Om",
-        redirectUrl: "student/dashboard.html"
-      },
-      "admin@test.com": {
-        password: "admin123",
-        role: "ADMIN",
-        name: "System Administrator",
-        redirectUrl: "admin/dashboard.html"
-      }
-    };
-
     const loginForm = document.getElementById("loginForm");
     const loginError = document.getElementById("loginError");
+    const btnSignIn = document.getElementById("btnSignIn");
 
-    loginForm.addEventListener("submit", function (e) {
+    loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
       loginError.style.display = "none";
 
       const email = document.getElementById("email").value.trim().toLowerCase();
       const password = document.getElementById("password").value;
 
-      const user = MOCK_CREDENTIALS[email];
+      btnSignIn.disabled = true;
+      btnSignIn.textContent = "Signing In...";
 
-      if (user && user.password === password) {
-        // Save demo session for local UI testing
-        sessionStorage.setItem("demoUser", JSON.stringify({
-          email: email,
-          role: user.role,
-          name: user.name
-        }));
+      try {
+        // Send authentication request to Java Servlet
+        const response = await fetch("api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+          },
+          body: new URLSearchParams({
+            email: email,
+            password: password
+          })
+        });
 
-        // Navigate to the respective dashboard
-        window.location.href = user.redirectUrl;
-      } else {
-        loginError.textContent = "Invalid credentials. Demo accounts: student@test.com (pass: student123) or admin@test.com (pass: admin123)";
-        loginError.style.display = "block";
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Store session info locally for UI header/name rendering
+          sessionStorage.setItem("demoUser", JSON.stringify({
+            id: data.id,
+            email: data.email,
+            role: data.role,
+            name: data.name,
+            department: data.department
+          }));
+
+          // Redirect to authorized workspace
+          window.location.href = data.redirectUrl;
+        } else {
+          loginError.textContent = data.message || "Invalid email or password.";
+          loginError.style.display = "block";
+          btnSignIn.disabled = false;
+          btnSignIn.textContent = "Sign In";
+        }
+      } catch (err) {
+        console.warn("Backend /api/login unavailable (running outside Tomcat?). Falling back to demo mock login.", err);
+
+        // Demo fallback for local non-server preview
+        const MOCK_CREDENTIALS = {
+          "student@test.com": {
+            password: "student123",
+            role: "STUDENT",
+            name: "Om",
+            redirectUrl: "student/dashboard.html"
+          },
+          "admin@test.com": {
+            password: "admin123",
+            role: "ADMIN",
+            name: "System Administrator",
+            redirectUrl: "admin/dashboard.html"
+          }
+        };
+
+        const mockUser = MOCK_CREDENTIALS[email];
+        if (mockUser && mockUser.password === password) {
+          sessionStorage.setItem("demoUser", JSON.stringify({
+            email: email,
+            role: mockUser.role,
+            name: mockUser.name
+          }));
+          window.location.href = mockUser.redirectUrl;
+        } else {
+          loginError.textContent = "Invalid credentials. Demo accounts: student@test.com (pass: student123) or admin@test.com (pass: admin123)";
+          loginError.style.display = "block";
+          btnSignIn.disabled = false;
+          btnSignIn.textContent = "Sign In";
+        }
       }
     });
   </script>
