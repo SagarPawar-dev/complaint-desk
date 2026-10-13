@@ -155,9 +155,9 @@
       const unreadBadgeEl = document.getElementById("adminUnreadCounterBadge");
       const markAllBtn = document.getElementById("adminMarkAllReadBtn");
 
-      function renderAdminNotifications() {
-        const notifs = ComplaintStore.getNotifications("ADMIN", "admin@test.com");
-        const unreadCount = ComplaintStore.getUnreadCount("ADMIN", "admin@test.com");
+      async function renderAdminNotifications() {
+        const notifs = await ComplaintStore.getNotifications();
+        const unreadCount = await ComplaintStore.getUnreadCount();
 
         // Update page unread counter and Mark All button
         if (unreadCount > 0) {
@@ -170,11 +170,11 @@
         }
 
         // Update top header bell badge
-        ComplaintStore.updateBellBadge("ADMIN", "admin@test.com");
+        ComplaintStore.updateBellBadge();
 
         container.innerHTML = "";
 
-        if (notifs.length === 0) {
+        if (!notifs || notifs.length === 0) {
           container.innerHTML = '<p style="color:#64748b; padding:24px 0; text-align:center;">No admin notifications currently.</p>';
           return;
         }
@@ -215,10 +215,10 @@
             </div>
           `;
 
-          card.addEventListener("click", () => {
+          card.addEventListener("click", async () => {
             if (!n.read) {
-              ComplaintStore.markNotificationAsRead(n.id);
-              ComplaintStore.updateBellBadge("ADMIN", "admin@test.com");
+              await ComplaintStore.markNotificationAsRead(n.id);
+              ComplaintStore.updateBellBadge();
             }
             if (n.complaintId) {
               window.location.href = `complaint-details.html?id=${n.complaintId}`;
@@ -231,8 +231,9 @@
         });
       }
 
-      markAllBtn.addEventListener("click", () => {
-        ComplaintStore.markAllNotificationsAsRead("ADMIN", "admin@test.com");
+      markAllBtn.addEventListener("click", async () => {
+        await ComplaintStore.markAllNotificationsAsRead();
+        ComplaintStore.updateBellBadge();
         renderAdminNotifications();
       });
 

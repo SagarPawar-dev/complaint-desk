@@ -21,6 +21,15 @@
     .back-link { display: inline-block; margin-top: 20px; color: #2563eb; text-decoration: none; font-size: 14px; font-weight: 500; }
   </style>
 </head>
+<%
+  // Security Guard: Diagnostic endpoint restricted to authenticated Admin users only
+  HttpSession userSession = request.getSession(false);
+  com.complaint.model.User currentUser = (userSession != null) ? (com.complaint.model.User) userSession.getAttribute("user") : null;
+  if (currentUser == null || !"ADMIN".equalsIgnoreCase(currentUser.getRole())) {
+      response.sendRedirect(request.getContextPath() + "/login.html");
+      return;
+  }
+%>
 <body>
   <div class="card">
     <h2>Supabase PostgreSQL Connection Status</h2>
@@ -49,7 +58,7 @@
     %>
       <div class="badge-error">&#10007; Connection Failed</div>
       <p style="font-size: 14px; color: #64748b; margin-top: 0;">Tomcat could not establish a connection using the current <code>WEB-INF/db.properties</code> settings.</p>
-      <pre><%= e.getMessage() %></pre>
+      <pre>Database connection could not be established. Please inspect Tomcat server logs for details.</pre>
     <%
       } finally {
         if (conn != null) {
@@ -57,7 +66,7 @@
         }
       }
     %>
-    <a href="login.html" class="back-link">&larr; Return to Login Portal</a>
+    <a href="admin/dashboard.html" class="back-link">&larr; Return to Admin Dashboard</a>
   </div>
 </body>
 </html>

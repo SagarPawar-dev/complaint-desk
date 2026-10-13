@@ -96,53 +96,8 @@ INSERT INTO users (id, full_name, email, password_hash, department, role, status
 -- Synchronize serial sequence for users table
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 
--- B. Seed Complaints
-INSERT INTO complaints (id, title, category, priority, location, description, status, student_id, created_at, updated_at) VALUES
-(
-    'CMP-00001',
-    'Classroom Projector Not Working',
-    'IT / Equipment',
-    'High',
-    'Block B, Room 204',
-    'Projector lamp is not turning on and HDMI cable socket is damaged.',
-    'CLOSED',
-    1,
-    NOW() - INTERVAL '10 days',
-    NOW() - INTERVAL '9 days'
-),
-(
-    'CMP-00002',
-    'fan not working',
-    'Electrical',
-    'Medium',
-    'Library 1st Floor, Reading Hall (Fan #3)',
-    'Ceiling fan #3 makes a loud rattling noise and stopped spinning completely since yesterday.',
-    'PENDING',
-    1,
-    NOW() - INTERVAL '2 days',
-    NOW() - INTERVAL '2 days'
-);
-
--- C. Seed Complaint Timeline
-INSERT INTO complaint_timeline (complaint_id, action, performed_by, user_id, note, status, created_at) VALUES
--- Timeline for CMP-00001
-('CMP-00001', 'Complaint Submitted', 'Om Sharma (Student)', 1, 'Initial report of projector failure.', 'PENDING', NOW() - INTERVAL '10 days'),
-('CMP-00001', 'Status Updated to IN PROGRESS', 'System Administrator', 2, 'Technician assigned to inspect the projector in Room 204.', 'IN PROGRESS', NOW() - INTERVAL '9 days 20 hours'),
-('CMP-00001', 'Complaint Resolved & Closed', 'System Administrator', 2, 'Replaced lamp module and renewed HDMI wall socket. Verified functional.', 'CLOSED', NOW() - INTERVAL '9 days 16 hours'),
-
--- Timeline for CMP-00002
-('CMP-00002', 'Complaint Submitted', 'Om Sharma (Student)', 1, 'Initial grievance submitted with Medium priority.', 'PENDING', NOW() - INTERVAL '2 days');
-
--- D. Seed Notifications
--- NOTIF-1: For student (Resolved notification)
-INSERT INTO notifications (complaint_id, user_id, recipient_role, title, message, type, is_read, created_at) VALUES
-('CMP-00001', 1, 'STUDENT', 'Complaint Resolved (CMP-00001)', 'Admin closed ''Classroom Projector Not Working''. Remark: Replaced lamp module and renewed HDMI socket.', 'RESOLVED', FALSE, NOW() - INTERVAL '9 days 16 hours'),
-
--- NOTIF-2: For admin (New submission notification)
-('CMP-00002', 2, 'ADMIN', 'New Complaint Submitted (CMP-00002)', 'Om Sharma submitted ''fan not working'' in Library 1st Floor.', 'NEW_SUBMISSION', FALSE, NOW() - INTERVAL '2 days'),
-
--- NOTIF-3: For student (Review status notification)
-('CMP-00002', 1, 'STUDENT', 'Complaint Under Review (CMP-00002)', 'Admin started reviewing ''fan not working'' in Library 1st Floor.', 'PENDING', FALSE, NOW() - INTERVAL '1 day 23 hours');
+-- B. Persistent Complaint ID Sequence (Ensures deleted IDs are NEVER reused)
+CREATE SEQUENCE IF NOT EXISTS complaint_id_seq START WITH 1;
 
 -- ==============================================================================
 -- 5. VERIFICATION QUERY (Run this to confirm counts after execution)

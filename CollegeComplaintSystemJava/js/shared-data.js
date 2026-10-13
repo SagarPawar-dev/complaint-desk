@@ -1,354 +1,391 @@
 /**
  * ==============================================================================
- * College Complaint Management System - Shared Mock Data Module (Phase 2)
+ * College Complaint Management System - Backend Integration Module
  * ==============================================================================
- * Manages persistent local data via browser localStorage across all HTML pages.
- * Simulates real database operations:
- *   - Auto-incrementing complaint IDs (CMP-00001, CMP-00002, ...)
- *   - Chronological Activity Timelines (submission, status updates, admin remarks)
- *   - Cross-role Notification triggers (student <-> admin)
+ * Connects frontend interfaces directly to Jakarta Servlets and Supabase PostgreSQL:
+ *   - /api/login and /api/logout
+ *   - /api/complaints, /api/complaints/status, /api/complaints/response
+ *   - /api/stats
+ *   - /api/notifications
+ *   - /api/users
  * ==============================================================================
  */
 
-const STORAGE_KEYS = {
-  COMPLAINTS: "ccs_complaints_data",
-  NOTIFICATIONS: "ccs_notifications_data"
-};
-
-// Initial default seed complaints matching the original screenshots
-const DEFAULT_COMPLAINTS = [
-  {
-    id: "CMP-00002",
-    title: "fan not working",
-    category: "Electrical",
-    priority: "Medium",
-    location: "Library 1st Floor, Reading Hall (Fan #3)",
-    description: "Ceiling fan #3 makes a loud rattling noise and stopped spinning completely since yesterday.",
-    status: "PENDING",
-    submittedBy: "student@test.com",
-    studentName: "Om Sharma",
-    studentDept: "Computer Science & Engineering",
-    submittedAt: "05/10/2026 10:30 AM",
-    timeline: [
-      {
-        action: "Complaint Submitted",
-        by: "Om Sharma (Student)",
-        time: "05/10/2026 10:30 AM",
-        note: "Initial grievance submitted with Medium priority.",
-        status: "PENDING"
-      }
-    ]
-  },
-  {
-    id: "CMP-00001",
-    title: "Classroom Projector Not Working",
-    category: "IT / Equipment",
-    priority: "High",
-    location: "Block B, Room 204",
-    description: "Projector lamp is not turning on and HDMI cable socket is damaged.",
-    status: "CLOSED",
-    submittedBy: "student@test.com",
-    studentName: "Om Sharma",
-    studentDept: "Computer Science & Engineering",
-    submittedAt: "03/10/2026 09:15 AM",
-    timeline: [
-      {
-        action: "Complaint Submitted",
-        by: "Om Sharma (Student)",
-        time: "03/10/2026 09:15 AM",
-        note: "Initial report of projector failure.",
-        status: "PENDING"
-      },
-      {
-        action: "Status Updated to IN PROGRESS",
-        by: "System Administrator",
-        time: "03/10/2026 11:45 AM",
-        note: "Technician assigned to inspect the projector in Room 204.",
-        status: "IN PROGRESS"
-      },
-      {
-        action: "Complaint Resolved & Closed",
-        by: "System Administrator",
-        time: "03/10/2026 04:15 PM",
-        note: "Replaced lamp module and renewed HDMI wall socket. Verified functional.",
-        status: "CLOSED"
-      }
-    ]
-  }
-];
-
-// Initial default notifications
-const DEFAULT_NOTIFICATIONS = [
-  {
-    id: "NOTIF-001",
-    complaintId: "CMP-00001",
-    recipientEmail: "student@test.com",
-    recipientRole: "STUDENT",
-    title: "Complaint Resolved (CMP-00001)",
-    message: "Admin closed 'Classroom Projector Not Working'. Remark: Replaced lamp module and renewed HDMI socket.",
-    time: "03/10/2026 04:15 PM",
-    type: "RESOLVED",
-    read: false
-  },
-  {
-    id: "NOTIF-002",
-    complaintId: "CMP-00002",
-    recipientEmail: "admin@test.com",
-    recipientRole: "ADMIN",
-    title: "New Complaint Submitted (CMP-00002)",
-    message: "Om Sharma submitted 'fan not working' in Library 1st Floor.",
-    time: "05/10/2026 10:30 AM",
-    type: "NEW_SUBMISSION",
-    read: false
-  },
-  {
-    id: "NOTIF-003",
-    complaintId: "CMP-00002",
-    recipientEmail: "student@test.com",
-    recipientRole: "STUDENT",
-    title: "Complaint Under Review (CMP-00002)",
-    message: "Admin started reviewing 'fan not working' in Library 1st Floor.",
-    time: "05/10/2026 10:35 AM",
-    type: "PENDING",
-    read: false
-  }
-];
-
-// Initialize localStorage on first run
-function initStorage() {
-  if (!localStorage.getItem(STORAGE_KEYS.COMPLAINTS)) {
-    localStorage.setItem(STORAGE_KEYS.COMPLAINTS, JSON.stringify(DEFAULT_COMPLAINTS));
-  } else {
-    try {
-      const data = JSON.parse(localStorage.getItem(STORAGE_KEYS.COMPLAINTS));
-      const cleaned = data.filter(c => c.submittedBy !== "priya@test.com");
-      localStorage.setItem(STORAGE_KEYS.COMPLAINTS, JSON.stringify(cleaned));
-    } catch (e) {}
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS)) {
-    localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(DEFAULT_NOTIFICATIONS));
-  } else {
-    try {
-      const notifs = JSON.parse(localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS));
-      let changed = false;
-      notifs.forEach(n => {
-        if (typeof n.read !== "boolean") {
-          n.read = false;
-          changed = true;
-        }
-      });
-      if (changed) {
-        localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
-      }
-    } catch (e) {}
-  }
-}
-
-initStorage();
-
-// Shared Data API
 const ComplaintStore = {
-  getAllComplaints: function () {
-    try {
-      const data = localStorage.getItem(STORAGE_KEYS.COMPLAINTS);
-      return data ? JSON.parse(data) : DEFAULT_COMPLAINTS;
-    } catch (e) {
-      return DEFAULT_COMPLAINTS;
+  /**
+   * Helper to resolve relative API path depending on current subfolder (/student/ or /admin/)
+   */
+  getApiUrl: function (endpoint) {
+    const clean = endpoint.startsWith("/") ? endpoint.substring(1) : endpoint;
+    const path = (window.location.pathname || "").toLowerCase();
+    if (path.includes("/student/") || path.includes("/admin/")) {
+      return "../" + clean;
     }
+    return clean;
   },
 
-  getStudentComplaints: function (studentEmail) {
-    const all = this.getAllComplaints();
-    if (!studentEmail) return all;
-    return all.filter(c => c.submittedBy === studentEmail);
-  },
-
-  getComplaintById: function (id) {
-    const all = this.getAllComplaints();
-    return all.find(c => c.id === id) || null;
-  },
-
-  getUsers: function () {
-    return [
-      { id: "USR-101", name: "Om Sharma", email: "student@test.com", dept: "Computer Science & Engineering", role: "STUDENT", status: "ACTIVE" },
-      { id: "USR-001", name: "System Administrator", email: "admin@test.com", dept: "College Administration", role: "ADMIN", status: "ACTIVE" }
-    ];
-  },
-
-  createComplaint: function (data) {
-    const all = this.getAllComplaints();
-    
-    // Generate next ID
-    const nextNum = all.length + 1;
-    const padded = String(nextNum).padStart(5, '0');
-    const newId = `CMP-${padded}`;
-
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    const newComplaint = {
-      id: newId,
-      title: data.title,
-      category: data.category,
-      priority: data.priority || "Medium",
-      location: data.location || "Main Campus",
-      description: data.description,
-      status: "PENDING",
-      submittedBy: data.submittedBy || "student@test.com",
-      studentName: data.studentName || "Om Sharma",
-      studentDept: data.studentDept || "Computer Science & Engineering",
-      submittedAt: formattedDate,
-      timeline: [
-        {
-          action: "Complaint Submitted",
-          by: `${data.studentName || "Student"} (Student)`,
-          time: formattedDate,
-          note: "Initial grievance submitted with " + (data.priority || "Medium") + " priority.",
-          status: "PENDING"
-        }
-      ]
-    };
-
-    // Prepend new complaint so it appears at top
-    all.unshift(newComplaint);
-    localStorage.setItem(STORAGE_KEYS.COMPLAINTS, JSON.stringify(all));
-
-    // Create notification for ADMIN
-    this.addNotification({
-      complaintId: newId,
-      recipientEmail: "admin@test.com",
-      recipientRole: "ADMIN",
-      title: `New Complaint: ${newComplaint.title} (${newId})`,
-      message: `${newComplaint.studentName} filed a new complaint under ${newComplaint.category}.`,
-      time: formattedDate,
-      type: "NEW_SUBMISSION"
-    });
-
-    return newComplaint;
-  },
-
-  updateComplaintStatus: function (id, newStatus, adminRemark) {
-    const all = this.getAllComplaints();
-    const index = all.findIndex(c => c.id === id);
-    if (index === -1) return null;
-
-    const complaint = all[index];
-    const oldStatus = complaint.status;
-    complaint.status = newStatus;
-
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // Add timeline entry
-    complaint.timeline.push({
-      action: `Status Changed from ${oldStatus} to ${newStatus}`,
-      by: "System Administrator",
-      time: formattedDate,
-      note: adminRemark ? `Admin Remark: "${adminRemark}"` : "Status was updated by administrator.",
-      status: newStatus
-    });
-
-    all[index] = complaint;
-    localStorage.setItem(STORAGE_KEYS.COMPLAINTS, JSON.stringify(all));
-
-    // Notify the student
-    this.addNotification({
-      complaintId: id,
-      recipientEmail: complaint.submittedBy,
-      recipientRole: "STUDENT",
-      title: `Complaint Status Updated (${id})`,
-      message: `Your complaint '${complaint.title}' is now ${newStatus}. ${adminRemark ? `Admin remarked: "${adminRemark}"` : ""}`,
-      time: formattedDate,
-      type: newStatus
-    });
-
-    return complaint;
-  },
-
-  addAdminResponse: function (id, responseText) {
-    const all = this.getAllComplaints();
-    const index = all.findIndex(c => c.id === id);
-    if (index === -1) return null;
-
-    const complaint = all[index];
-    const now = new Date();
-    const formattedDate = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // Add timeline entry for response
-    complaint.timeline.push({
-      action: "Admin Response",
-      by: "System Administrator",
-      time: formattedDate,
-      note: responseText,
-      status: complaint.status
-    });
-
-    all[index] = complaint;
-    localStorage.setItem(STORAGE_KEYS.COMPLAINTS, JSON.stringify(all));
-
-    // Notify the student
-    this.addNotification({
-      complaintId: id,
-      recipientEmail: complaint.submittedBy,
-      recipientRole: "STUDENT",
-      title: `New Response on Complaint (${id})`,
-      message: `Admin added a response: "${responseText.substring(0, 80)}${responseText.length > 80 ? '...' : ''}"`,
-      time: formattedDate,
-      type: "RESPONSE"
-    });
-
-    return complaint;
-  },
-
-  getNotifications: function (role, email) {
+  /**
+   * Retrieves all institution complaints from PostgreSQL (Admin workspace)
+   */
+  getAllComplaints: async function () {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
-      const all = data ? JSON.parse(data) : DEFAULT_NOTIFICATIONS;
-      if (role === "ADMIN") {
-        return all.filter(n => n.recipientRole === "ADMIN");
+      const res = await fetch(this.getApiUrl("api/complaints"), {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) {
+        throw new Error("Failed to load complaints (HTTP " + res.status + ")");
       }
-      return all.filter(n => n.recipientRole === "STUDENT" && (!email || n.recipientEmail === email));
-    } catch (e) {
+      return await res.json();
+    } catch (err) {
+      console.error("[ComplaintStore] getAllComplaints error:", err);
       return [];
     }
   },
 
-  getUnreadCount: function (role, email) {
-    const list = this.getNotifications(role, email);
-    return list.filter(n => !n.read).length;
-  },
-
-  markNotificationAsRead: function (id) {
+  /**
+   * Retrieves complaints for a specific student (or current student session)
+   */
+  getStudentComplaints: async function (studentEmail) {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
-      const all = data ? JSON.parse(data) : DEFAULT_NOTIFICATIONS;
-      const index = all.findIndex(n => n.id === id);
-      if (index !== -1) {
-        all[index].read = true;
-        localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(all));
-        return all[index];
-      }
-    } catch (e) {}
-    return null;
-  },
-
-  markAllNotificationsAsRead: function (role, email) {
-    try {
-      const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
-      const all = data ? JSON.parse(data) : DEFAULT_NOTIFICATIONS;
-      all.forEach(n => {
-        if (role === "ADMIN" && n.recipientRole === "ADMIN") {
-          n.read = true;
-        } else if (role === "STUDENT" && n.recipientRole === "STUDENT" && (!email || n.recipientEmail === email)) {
-          n.read = true;
-        }
+      const url = studentEmail
+        ? this.getApiUrl("api/complaints?studentEmail=" + encodeURIComponent(studentEmail))
+        : this.getApiUrl("api/complaints");
+      const res = await fetch(url, {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
       });
-      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(all));
-    } catch (e) {}
+      if (!res.ok) {
+        throw new Error("Failed to load student complaints (HTTP " + res.status + ")");
+      }
+      return await res.json();
+    } catch (err) {
+      console.error("[ComplaintStore] getStudentComplaints error:", err);
+      return [];
+    }
   },
 
-  updateBellBadge: function (role, email) {
-    const count = this.getUnreadCount(role, email);
+  /**
+   * Retrieves a single complaint by ticket ID including full timeline history
+   */
+  getComplaintById: async function (id) {
+    if (!id) return null;
+    try {
+      const res = await fetch(this.getApiUrl("api/complaints?id=" + encodeURIComponent(id)), {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) {
+        if (res.status === 404) return null;
+        throw new Error("Complaint " + id + " error (HTTP " + res.status + ")");
+      }
+      return await res.json();
+    } catch (err) {
+      console.error("[ComplaintStore] getComplaintById error:", err);
+      return null;
+    }
+  },
+
+  /**
+   * Submits a new grievance to the database
+   */
+  createComplaint: async function (data) {
+    try {
+      const res = await fetch(this.getApiUrl("api/complaints"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        },
+        credentials: "same-origin",
+        body: new URLSearchParams({
+          title: data.title || "",
+          category: data.category || "",
+          priority: data.priority || "Medium",
+          location: data.location || "",
+          description: data.description || ""
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || "Failed to create complaint (HTTP " + res.status + ")");
+      }
+      return json;
+    } catch (err) {
+      console.error("[ComplaintStore] createComplaint error:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Updates complaint status with an administrative remark
+   */
+  updateComplaintStatus: async function (id, newStatus, adminRemark) {
+    try {
+      const res = await fetch(this.getApiUrl("api/complaints/status"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        },
+        credentials: "same-origin",
+        body: new URLSearchParams({
+          id: id,
+          status: newStatus,
+          remark: adminRemark || ""
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || "Failed to update complaint status");
+      }
+      return json;
+    } catch (err) {
+      console.error("[ComplaintStore] updateComplaintStatus error:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Posts an administrative response to the complaint timeline
+   */
+  addAdminResponse: async function (id, responseText) {
+    try {
+      const res = await fetch(this.getApiUrl("api/complaints/response"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        },
+        credentials: "same-origin",
+        body: new URLSearchParams({
+          id: id,
+          response: responseText
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || "Failed to post response");
+      }
+      return json;
+    } catch (err) {
+      console.error("[ComplaintStore] addAdminResponse error:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Permanently deletes a complaint and dependent records (Admin only)
+   */
+  deleteComplaint: async function (id) {
+    if (!id) throw new Error("Complaint ID is required");
+    try {
+      const res = await fetch(this.getApiUrl("api/complaints/delete"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        },
+        credentials: "same-origin",
+        body: new URLSearchParams({ id: id })
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || "Failed to delete complaint (HTTP " + res.status + ")");
+      }
+      return json;
+    } catch (err) {
+      console.error("[ComplaintStore] deleteComplaint error:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Fetches real-time statistics from PostgreSQL
+   */
+  getStats: async function (studentEmail) {
+    try {
+      const res = await fetch(this.getApiUrl("api/stats"), {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status);
+      }
+      return await res.json();
+    } catch (err) {
+      console.error("[ComplaintStore] getStats error:", err);
+      return { total: 0, pending: 0, progress: 0, resolved: 0 };
+    }
+  },
+
+  /**
+   * Fetches alerts and notifications for the current authenticated user
+   */
+  getNotifications: async function (role, email) {
+    try {
+      const res = await fetch(this.getApiUrl("api/notifications"), {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status);
+      }
+      return await res.json();
+    } catch (err) {
+      console.error("[ComplaintStore] getNotifications error:", err);
+      return [];
+    }
+  },
+
+  /**
+   * Gets unread alert count for current user
+   */
+  getUnreadCount: async function (role, email) {
+    try {
+      const res = await fetch(this.getApiUrl("api/notifications?action=unread-count"), {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) return 0;
+      const data = await res.json();
+      return typeof data.count === "number" ? data.count : 0;
+    } catch (err) {
+      return 0;
+    }
+  },
+
+  /**
+   * Marks a single notification as read
+   */
+  markNotificationAsRead: async function (id) {
+    try {
+      const res = await fetch(this.getApiUrl("api/notifications"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        },
+        credentials: "same-origin",
+        body: new URLSearchParams({ id: id })
+      });
+      return res.ok;
+    } catch (err) {
+      return false;
+    }
+  },
+
+  /**
+   * Marks all notifications as read for current user
+   */
+  markAllNotificationsAsRead: async function (role, email) {
+    try {
+      const res = await fetch(this.getApiUrl("api/notifications?action=read-all"), {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      return res.ok;
+    } catch (err) {
+      return false;
+    }
+  },
+
+  /**
+   * Fetches institutional users from PostgreSQL (Admin User Management)
+   */
+  getUsers: async function () {
+    try {
+      const res = await fetch(this.getApiUrl("api/users"), {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status);
+      }
+      return await res.json();
+    } catch (err) {
+      console.error("[ComplaintStore] getUsers error:", err);
+      return [];
+    }
+  },
+
+  /**
+   * Retrieves profile details for the currently logged in user
+   */
+  getCurrentUser: async function () {
+    try {
+      const res = await fetch(this.getApiUrl("api/users/me"), {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      if (res.ok) {
+        const u = await res.json();
+        if (u && u.email) return u;
+      }
+    } catch (err) {}
+    try {
+      return JSON.parse(sessionStorage.getItem("demoUser")) || null;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  /**
+   * Updates authenticated user profile details (full name and department)
+   */
+  updateProfile: async function (fullName, department) {
+    if (!fullName || !fullName.trim()) throw new Error("Name cannot be empty");
+    try {
+      const res = await fetch(this.getApiUrl("api/users/profile"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        },
+        credentials: "same-origin",
+        body: new URLSearchParams({
+          fullName: fullName.trim(),
+          department: (department || "").trim()
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || "Failed to update profile (HTTP " + res.status + ")");
+      }
+
+      // Keep client-side cache & UI synchronized
+      const updatedName = json.user && json.user.fullName ? json.user.fullName : fullName.trim();
+      try {
+        const stored = JSON.parse(sessionStorage.getItem("demoUser")) || {};
+        stored.name = updatedName;
+        if (json.user && json.user.department) stored.department = json.user.department;
+        sessionStorage.setItem("demoUser", JSON.stringify(stored));
+      } catch (e) {}
+
+      // Refresh any name elements across the DOM
+      const nameDisplays = document.querySelectorAll("#userNameDisplay, .user-name");
+      nameDisplays.forEach(el => {
+        el.textContent = updatedName;
+      });
+
+      return json;
+    } catch (err) {
+      console.error("[ComplaintStore] updateProfile error:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Updates top header notification bell badge
+   */
+  updateBellBadge: async function (role, email) {
+    const count = await this.getUnreadCount(role, email);
     const badges = document.querySelectorAll(".notification-badge");
     badges.forEach(badge => {
       if (count > 0) {
@@ -361,28 +398,8 @@ const ComplaintStore = {
     });
   },
 
-  addNotification: function (notif) {
-    try {
-      const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
-      const all = data ? JSON.parse(data) : [];
-      notif.id = "NOTIF-" + Date.now();
-      notif.read = false;
-      all.unshift(notif);
-      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(all));
-    } catch (e) {}
-  },
-
-  getStats: function (studentEmail) {
-    const list = studentEmail ? this.getStudentComplaints(studentEmail) : this.getAllComplaints();
-    const total = list.length;
-    const pending = list.filter(c => c.status === "PENDING" || c.status === "SUBMITTED").length;
-    const progress = list.filter(c => c.status === "IN PROGRESS" || c.status === "IN_PROGRESS").length;
-    const resolved = list.filter(c => c.status === "RESOLVED" || c.status === "CLOSED").length;
-    return { total, pending, progress, resolved };
-  },
-
   /**
-   * Client-side session verification (defense-in-depth).
+   * Client-side session verification.
    * Validates server-side session with /api/login and redirects unauthenticated users.
    */
   verifySession: async function () {
@@ -391,38 +408,61 @@ const ComplaintStore = {
     const isStudent = path.includes("/student/");
     if (!isAdmin && !isStudent) return;
 
-    if (window.location.protocol.startsWith("http")) {
-      try {
-        const res = await fetch("../api/login", { credentials: "same-origin" });
-        if (res.ok) {
-          const data = await res.json();
-          if (!data || !data.authenticated) {
-            window.location.replace("../login.html");
-            return;
-          }
-          if (isAdmin && data.role !== "ADMIN") {
-            window.location.replace("../student/dashboard.html");
-            return;
-          }
-          if (isStudent && data.role !== "STUDENT") {
-            window.location.replace("../admin/dashboard.html");
-            return;
-          }
+    try {
+      const res = await fetch(this.getApiUrl("api/login"), {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (!data || !data.authenticated) {
+          window.location.replace("../login.html");
+          return;
         }
-      } catch (e) {
-        // Fallback for standalone demo mode
+        if (isAdmin && data.role !== "ADMIN") {
+          window.location.replace("../student/dashboard.html");
+          return;
+        }
+        if (isStudent && data.role !== "STUDENT") {
+          window.location.replace("../admin/dashboard.html");
+          return;
+        }
+
+        // Keep local profile display fresh
+        sessionStorage.setItem("demoUser", JSON.stringify({
+          id: data.id,
+          email: data.email,
+          role: data.role,
+          name: data.name,
+          department: data.department
+        }));
+
+        // Dynamically update user name on top header
+        const nameDisplays = document.querySelectorAll("#userNameDisplay, .user-name");
+        nameDisplays.forEach(el => {
+          if (data.name) el.textContent = data.name;
+        });
+
+      } else {
+        window.location.replace("../login.html");
       }
+    } catch (err) {
+      console.warn("[ComplaintStore] verifySession failed:", err);
     }
   },
 
+  /**
+   * Terminates server-side session and redirects to login
+   */
   logout: async function () {
     try {
       sessionStorage.clear();
-      await fetch("../api/logout", {
+      await fetch(this.getApiUrl("api/logout"), {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Accept": "application/json" }
       });
-    } catch (e) {}
+    } catch (err) {}
     window.location.href = "../login.html";
   }
 };
@@ -431,18 +471,6 @@ const ComplaintStore = {
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", function () {
     ComplaintStore.verifySession();
-
-    const path = (window.location.pathname || "").toLowerCase();
-    const isAdmin = path.includes("/admin/");
-    let role = isAdmin ? "ADMIN" : "STUDENT";
-    let email = isAdmin ? "admin@test.com" : "student@test.com";
-    try {
-      const demoUser = JSON.parse(sessionStorage.getItem("demoUser"));
-      if (demoUser && demoUser.email) {
-        email = demoUser.email;
-        if (demoUser.role) role = demoUser.role;
-      }
-    } catch (e) {}
 
     // Ensure all bell buttons have a badge element attached
     const bellBtns = document.querySelectorAll(".notification-bell-btn");
@@ -455,6 +483,6 @@ if (typeof document !== "undefined") {
       }
     });
 
-    ComplaintStore.updateBellBadge(role, email);
+    ComplaintStore.updateBellBadge();
   });
 }

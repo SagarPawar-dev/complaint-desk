@@ -180,8 +180,25 @@
       const statusFilter = document.getElementById("adminStatusFilter");
       const categoryFilter = document.getElementById("adminCategoryFilter");
 
+      let complaintsData = [];
+
+      async function loadAdminComplaints() {
+        try {
+          complaintsData = await ComplaintStore.getAllComplaints();
+          renderAdminComplaints();
+        } catch (err) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="8" style="text-align:center; color:#ef4444; padding:28px 16px;">
+                Unable to load complaints from database. Please check connection.
+              </td>
+            </tr>
+          `;
+        }
+      }
+
       function renderAdminComplaints() {
-        const all = ComplaintStore.getAllComplaints();
+        const all = complaintsData || [];
         const query = searchInput.value.toLowerCase().trim();
         const selStatus = statusFilter.value;
         const selCategory = categoryFilter.value;
@@ -262,7 +279,7 @@
       statusFilter.addEventListener("change", renderAdminComplaints);
       categoryFilter.addEventListener("change", renderAdminComplaints);
 
-      renderAdminComplaints();
+      loadAdminComplaints();
     });
   </script>
 </body>

@@ -133,11 +133,11 @@
           <div class="form-grid-2">
             <div>
               <label style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Administrator</label>
-              <input type="text" class="search-input" value="System Administrator" style="width:100%;" readonly>
+              <input type="text" id="adminFullName" class="search-input" value="System Administrator" style="width:100%;" readonly>
             </div>
             <div>
               <label style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Admin Email</label>
-              <input type="email" class="search-input" value="admin@test.com" style="width:100%;" readonly>
+              <input type="email" id="adminEmail" class="search-input" value="admin@test.com" style="width:100%;" readonly>
             </div>
             <div>
               <label style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Access Level</label>
@@ -145,7 +145,7 @@
             </div>
             <div>
               <label style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Department</label>
-              <input type="text" class="search-input" value="College Administration Desk" style="width:100%;" readonly>
+              <input type="text" id="adminDept" class="search-input" value="College Administration" style="width:100%;" readonly>
             </div>
           </div>
         </section>
@@ -160,12 +160,24 @@
             <p><strong>System Name:</strong> College Complaint Desk</p>
             <p><strong>Runtime:</strong> Java Servlets + Apache Tomcat 10.1</p>
             <p><strong>Database:</strong> PostgreSQL (Supabase Cloud)</p>
-            <p style="margin-top:12px; color:#64748b; font-size:13px;">Phase 1: UI and Navigation established. Real persistence configured in Phase 3.</p>
+            <p style="margin-top:12px; color:#10b981; font-weight:600; font-size:13px;">Phase 3: Real PostgreSQL Backend Integration Complete.</p>
           </div>
         </section>
       </main>
     </div>
   </div>
 
+  <script src="../js/shared-data.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      ComplaintStore.updateBellBadge();
+      const user = await ComplaintStore.getCurrentUser();
+      if (user) {
+        if (user.fullName || user.name) document.getElementById("adminFullName").value = user.fullName || user.name;
+        if (user.email) document.getElementById("adminEmail").value = user.email;
+        if (user.department || user.dept) document.getElementById("adminDept").value = user.department || user.dept;
+      }
+    });
+  </script>
 </body>
 </html>

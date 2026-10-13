@@ -368,6 +368,65 @@ public class ComplaintDAO {
     }
 
     /**
+     * Atomically deletes a complaint and all associated timeline and notification records.
+     * Respects foreign-key constraints and executes within a single database transaction.
+     * Returns true if a complaint was deleted, false if the complaint was not found.
+     */
+    public boolean deleteComplaint(String complaintId) throws SQLException {
+        if (complaintId == null || complaintId.trim().isEmpty()) {
+            return false;
+        }
+
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); // Begin Transaction
+
+            // 1. Delete dependent notifications
+            String deleteNotifsSql = "DELETE FROM notifications WHERE complaint_id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteNotifsSql)) {
+                stmt.setString(1, complaintId.trim());
+                stmt.executeUpdate();
+            }
+
+            // 2. Delete dependent timeline items
+            String deleteTimelineSql = "DELETE FROM complaint_timeline WHERE complaint_id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteTimelineSql)) {
+                stmt.setString(1, complaintId.trim());
+                stmt.executeUpdate();
+            }
+
+            // 3. Delete complaint record
+            int affected;
+            String deleteComplaintSql = "DELETE FROM complaints WHERE id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteComplaintSql)) {
+                stmt.setString(1, complaintId.trim());
+                affected = stmt.executeUpdate();
+            }
+
+            conn.commit(); // Commit Transaction
+            return affected > 0;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Rollback failed during deleteComplaint: " + rollbackEx.getMessage());
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ignored) {}
+            }
+        }
+    }
+
+    /**
      * Calculates statistics (total, pending, progress, resolved) for dashboard stat cards.
      * If studentId is null, returns system-wide metrics for Admin.
      */
@@ -441,16 +500,23 @@ public class ComplaintDAO {
     }
 
     /**
-     * Generates the next sequential ID in CMP-0000X format.
+     * Generates the next sequential ID in CMP-0000X format using a database-backed sequence.
+     * Guarantees that deleted IDs are NEVER reused, maintaining strict monotonic progression.
      */
     private String generateNextComplaintId(Connection conn) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM complaints";
+        // Ensure sequence exists in database
+        try (Statement initStmt = conn.createStatement()) {
+            initStmt.execute("CREATE SEQUENCE IF NOT EXISTS complaint_id_seq START WITH 1");
+        }
+        String sql = "SELECT nextval('complaint_id_seq')";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-            int count = rs.next() ? rs.getInt(1) : 0;
-            int nextNumber = count + 1;
-            return String.format("CMP-%05d", nextNumber);
+            if (rs.next()) {
+                long nextVal = rs.getLong(1);
+                return String.format("CMP-%05d", nextVal);
+            }
         }
+        return "CMP-00001";
     }
 
     /**

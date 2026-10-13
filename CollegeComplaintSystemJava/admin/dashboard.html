@@ -171,48 +171,52 @@
 
   <script src="../js/shared-data.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Dynamic Stats
-      const stats = ComplaintStore.getStats();
-      document.getElementById("adminStatTotal").textContent = stats.total;
-      document.getElementById("adminStatPending").textContent = stats.pending;
-      document.getElementById("adminStatProgress").textContent = stats.progress;
-      document.getElementById("adminStatResolved").textContent = stats.resolved;
+    document.addEventListener("DOMContentLoaded", async function () {
+      try {
+        // Dynamic Stats from live PostgreSQL
+        const stats = await ComplaintStore.getStats();
+        document.getElementById("adminStatTotal").textContent = stats.total;
+        document.getElementById("adminStatPending").textContent = stats.pending;
+        document.getElementById("adminStatProgress").textContent = stats.progress;
+        document.getElementById("adminStatResolved").textContent = stats.resolved;
 
-      // Dynamic Recent Activity
-      const complaints = ComplaintStore.getAllComplaints();
-      const listEl = document.getElementById("adminRecentActivityList");
-      listEl.innerHTML = "";
+        // Dynamic Recent Activity from live PostgreSQL
+        const complaints = await ComplaintStore.getAllComplaints();
+        const listEl = document.getElementById("adminRecentActivityList");
+        listEl.innerHTML = "";
 
-      if (complaints.length === 0) {
-        listEl.innerHTML = '<p style="color:#64748b; font-size:14px; padding:10px 0;">No complaints recorded in the system.</p>';
-        return;
-      }
-
-      complaints.slice(0, 5).forEach(c => {
-        let badgeClass = "badge-submitted";
-        if (c.status === "RESOLVED" || c.status === "CLOSED") {
-          badgeClass = "badge-closed";
-        } else if (c.status === "IN PROGRESS" || c.status === "IN_PROGRESS") {
-          badgeClass = "badge-in-progress";
+        if (!complaints || complaints.length === 0) {
+          listEl.innerHTML = '<p style="color:#64748b; font-size:14px; padding:10px 0;">No complaints recorded in the system.</p>';
+          return;
         }
 
-        const item = document.createElement("div");
-        item.className = "activity-item";
-        item.style.cursor = "pointer";
-        item.title = "Click to manage complaint";
-        item.innerHTML = `
-          <div class="activity-info">
-            <h3>${c.title}</h3>
-            <div class="activity-meta">${c.id} &bull; ${c.submittedAt} &bull; <strong>${c.studentName || 'Student'}</strong></div>
-          </div>
-          <span class="status-badge ${badgeClass}">${c.status}</span>
-        `;
-        item.addEventListener("click", () => {
-          window.location.href = `complaint-details.html?id=${c.id}`;
+        complaints.slice(0, 5).forEach(c => {
+          let badgeClass = "badge-submitted";
+          if (c.status === "RESOLVED" || c.status === "CLOSED") {
+            badgeClass = "badge-closed";
+          } else if (c.status === "IN PROGRESS" || c.status === "IN_PROGRESS") {
+            badgeClass = "badge-in-progress";
+          }
+
+          const item = document.createElement("div");
+          item.className = "activity-item";
+          item.style.cursor = "pointer";
+          item.title = "Click to manage complaint";
+          item.innerHTML = `
+            <div class="activity-info">
+              <h3>${c.title}</h3>
+              <div class="activity-meta">${c.id} &bull; ${c.submittedAt} &bull; <strong>${c.studentName || 'Student'}</strong></div>
+            </div>
+            <span class="status-badge ${badgeClass}">${c.status}</span>
+          `;
+          item.addEventListener("click", () => {
+            window.location.href = `complaint-details.html?id=${c.id}`;
+          });
+          listEl.appendChild(item);
         });
-        listEl.appendChild(item);
-      });
+      } catch (err) {
+        console.error("Failed to load admin dashboard:", err);
+      }
     });
   </script>
 </body>

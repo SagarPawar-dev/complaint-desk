@@ -140,12 +140,18 @@ public class DBConnection {
         try {
             return DriverManager.getConnection(dbUrl, dbUser, dbPassword);
         } catch (SQLException e) {
-            // Mask password from any logged diagnostic output
-            String sanitizedUrl = dbUrl;
-            System.err.println("[DBConnection] Connection failed: " + e.getMessage());
-            System.err.println("[DBConnection] Attempted URL: " + sanitizedUrl);
-            System.err.println("[DBConnection] Attempted User: " + dbUser);
-            throw e;
+            // Transient WAN network retry (common with cloud databases over public internet)
+            try {
+                Thread.sleep(250);
+                return DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+            } catch (Exception retryEx) {
+                // Mask password from any logged diagnostic output
+                String sanitizedUrl = dbUrl;
+                System.err.println("[DBConnection] Connection failed: " + e.getMessage());
+                System.err.println("[DBConnection] Attempted URL: " + sanitizedUrl);
+                System.err.println("[DBConnection] Attempted User: " + dbUser);
+                throw e;
+            }
         }
     }
 

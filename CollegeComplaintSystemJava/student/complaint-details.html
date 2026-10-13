@@ -169,7 +169,7 @@
 
   <script src="../js/shared-data.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", async function () {
       // Parse ID from URL query: ?id=CMP-XXXXX
       const urlParams = new URLSearchParams(window.location.search);
       const complaintId = urlParams.get("id");
@@ -185,7 +185,19 @@
         return;
       }
 
-      const complaint = ComplaintStore.getComplaintById(complaintId);
+      let complaint = null;
+      try {
+        complaint = await ComplaintStore.getComplaintById(complaintId);
+      } catch (err) {
+        document.getElementById("detailsMainContent").innerHTML = `
+          <div class="section-card" style="text-align:center; padding:48px 24px;">
+            <h3 style="color:#ef4444;">Error Loading Complaint</h3>
+            <p style="color:#64748b; margin:10px 0 20px;">Unable to fetch complaint details from server.</p>
+            <a href="complaints.html" class="btn-report-complaint" style="display:inline-flex;">Back to Complaints</a>
+          </div>
+        `;
+        return;
+      }
 
       if (!complaint) {
         document.getElementById("detailsMainContent").innerHTML = `

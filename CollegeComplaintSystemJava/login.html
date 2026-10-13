@@ -82,38 +82,11 @@
           btnSignIn.textContent = "Sign In";
         }
       } catch (err) {
-        console.warn("Backend /api/login unavailable (running outside Tomcat?). Falling back to demo mock login.", err);
-
-        // Demo fallback for local non-server preview
-        const MOCK_CREDENTIALS = {
-          "student@test.com": {
-            password: "student123",
-            role: "STUDENT",
-            name: "Om",
-            redirectUrl: "student/dashboard.html"
-          },
-          "admin@test.com": {
-            password: "admin123",
-            role: "ADMIN",
-            name: "System Administrator",
-            redirectUrl: "admin/dashboard.html"
-          }
-        };
-
-        const mockUser = MOCK_CREDENTIALS[email];
-        if (mockUser && mockUser.password === password) {
-          sessionStorage.setItem("demoUser", JSON.stringify({
-            email: email,
-            role: mockUser.role,
-            name: mockUser.name
-          }));
-          window.location.href = mockUser.redirectUrl;
-        } else {
-          loginError.textContent = "Invalid credentials. Demo accounts: student@test.com (pass: student123) or admin@test.com (pass: admin123)";
-          loginError.style.display = "block";
-          btnSignIn.disabled = false;
-          btnSignIn.textContent = "Sign In";
-        }
+        console.error("Backend login error:", err);
+        loginError.textContent = "Unable to connect to the backend server. Please verify your connection or server status.";
+        loginError.style.display = "block";
+        btnSignIn.disabled = false;
+        btnSignIn.textContent = "Sign In";
       }
     });
   </script>

@@ -90,7 +90,7 @@
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
-            <span class="notification-badge">2</span>
+            <span class="notification-badge" style="display: none;">0</span>
           </button>
 
           <!-- User Profile Capsule -->
@@ -151,9 +151,9 @@
       const unreadBadgeEl = document.getElementById("unreadCounterBadge");
       const markAllBtn = document.getElementById("markAllReadBtn");
 
-      function renderNotifications() {
-        const notifs = ComplaintStore.getNotifications("STUDENT", studentEmail);
-        const unreadCount = ComplaintStore.getUnreadCount("STUDENT", studentEmail);
+      async function renderNotifications() {
+        const notifs = await ComplaintStore.getNotifications();
+        const unreadCount = await ComplaintStore.getUnreadCount();
 
         // Update page unread counter and Mark All button
         if (unreadCount > 0) {
@@ -166,11 +166,11 @@
         }
 
         // Update top header bell badge
-        ComplaintStore.updateBellBadge("STUDENT", studentEmail);
+        ComplaintStore.updateBellBadge();
 
         container.innerHTML = "";
 
-        if (notifs.length === 0) {
+        if (!notifs || notifs.length === 0) {
           container.innerHTML = '<p style="color:#64748b; padding:24px 0; text-align:center;">You have no notifications right now.</p>';
           return;
         }
@@ -210,10 +210,10 @@
             </div>
           `;
 
-          card.addEventListener("click", () => {
+          card.addEventListener("click", async () => {
             if (!n.read) {
-              ComplaintStore.markNotificationAsRead(n.id);
-              ComplaintStore.updateBellBadge("STUDENT", studentEmail);
+              await ComplaintStore.markNotificationAsRead(n.id);
+              ComplaintStore.updateBellBadge();
             }
             if (n.complaintId) {
               window.location.href = `complaint-details.html?id=${n.complaintId}`;
@@ -226,8 +226,9 @@
         });
       }
 
-      markAllBtn.addEventListener("click", () => {
-        ComplaintStore.markAllNotificationsAsRead("STUDENT", studentEmail);
+      markAllBtn.addEventListener("click", async () => {
+        await ComplaintStore.markAllNotificationsAsRead();
+        ComplaintStore.updateBellBadge();
         renderNotifications();
       });
 

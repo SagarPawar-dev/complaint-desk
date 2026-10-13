@@ -200,11 +200,35 @@
       const deptFilter = document.getElementById("userDeptFilter");
       const tableBody = document.getElementById("usersTableBody");
 
-      let currentSelectedEmail = "student@test.com"; // Default to Om Sharma
+      let currentSelectedEmail = "";
+      let usersList = [];
+      let allComplaintsList = [];
+
+      async function loadUsersData() {
+        try {
+          usersList = await ComplaintStore.getUsers();
+          allComplaintsList = await ComplaintStore.getAllComplaints();
+          renderUsers();
+          const firstStudent = usersList.find(u => u.role === "STUDENT");
+          if (firstStudent) {
+            currentSelectedEmail = firstStudent.email;
+            renderUsers();
+            inspectStudent(firstStudent);
+          }
+        } catch (err) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align:center; color:#ef4444; padding:28px 16px;">
+                Unable to load users from database.
+              </td>
+            </tr>
+          `;
+        }
+      }
 
       function renderUsers() {
-        const users = ComplaintStore.getUsers();
-        const allComplaints = ComplaintStore.getAllComplaints();
+        const users = usersList;
+        const allComplaints = allComplaintsList;
         const query = searchInput.value.toLowerCase().trim();
         const selRole = roleFilter.value;
         const selDept = deptFilter.value.toLowerCase();
@@ -292,7 +316,7 @@
         const badgeEl = document.getElementById("inspectorStudentBadge");
         badgeEl.style.display = "block";
 
-        const complaints = ComplaintStore.getStudentComplaints(student.email);
+        const complaints = allComplaintsList.filter(c => c.submittedBy === student.email);
 
         if (complaints.length === 0) {
           inspectorEl.innerHTML = `
@@ -418,12 +442,8 @@
       roleFilter.addEventListener("change", renderUsers);
       deptFilter.addEventListener("change", renderUsers);
 
-      // Initial load
-      renderUsers();
-      const initialStudent = ComplaintStore.getUsers().find(u => u.email === currentSelectedEmail);
-      if (initialStudent) {
-        inspectStudent(initialStudent);
-      }
+      // Initial load from live PostgreSQL
+      loadUsersData();
     });
   </script>
 </body>

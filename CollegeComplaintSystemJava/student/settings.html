@@ -90,7 +90,7 @@
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
-            <span class="notification-badge">2</span>
+            <span class="notification-badge" style="display: none;">0</span>
           </button>
 
           <!-- User Profile Capsule -->
@@ -118,26 +118,41 @@
         <section class="section-card" style="max-width: 760px;">
           <div class="section-card-header">
             <h2>Student Profile Details</h2>
+            <p style="font-size:12px; color:#64748b; margin-top:2px;">Update your personal profile information</p>
           </div>
 
-          <div class="form-grid-2">
-            <div>
-              <label style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Full Name</label>
-              <input type="text" class="search-input" value="Om Sharma" style="width:100%;" readonly>
+          <!-- Alert Feedback Container -->
+          <div id="profileAlert" style="display:none; padding:12px 16px; border-radius:6px; margin-bottom:16px; font-size:14px; font-weight:500;"></div>
+
+          <form id="profileForm">
+            <div class="form-grid-2">
+              <div>
+                <label for="studentFullName" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Full Name *</label>
+                <input type="text" id="studentFullName" class="search-input" value="Loading..." style="width:100%;" required>
+              </div>
+              <div>
+                <label for="studentEmail" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Email Address</label>
+                <input type="email" id="studentEmail" class="search-input" value="Loading..." style="width:100%; background:#f1f5f9; cursor:not-allowed;" readonly title="Email cannot be changed">
+              </div>
+              <div>
+                <label for="studentRole" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Role</label>
+                <input type="text" id="studentRole" class="search-input" value="STUDENT" style="width:100%; background:#f1f5f9; cursor:not-allowed;" readonly>
+              </div>
+              <div>
+                <label for="studentDept" style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Department</label>
+                <input type="text" id="studentDept" class="search-input" value="Loading..." style="width:100%; background:#f1f5f9; cursor:not-allowed;" readonly>
+              </div>
             </div>
-            <div>
-              <label style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Email Address</label>
-              <input type="email" class="search-input" value="student@test.com" style="width:100%;" readonly>
+
+            <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+              <button type="submit" id="btnSaveProfile" class="btn btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Save Changes</span>
+              </button>
             </div>
-            <div>
-              <label style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Role</label>
-              <input type="text" class="search-input" value="STUDENT" style="width:100%;" readonly>
-            </div>
-            <div>
-              <label style="display:block; font-size:12px; font-weight:600; color:#475569; text-transform:uppercase; margin-bottom:6px;">Department</label>
-              <input type="text" class="search-input" value="Computer Science & Engineering" style="width:100%;" readonly>
-            </div>
-          </div>
+          </form>
         </section>
 
         <!-- Account Preferences Card -->
@@ -149,12 +164,68 @@
           <div style="font-size:14px; color:#475569; line-height:1.7;">
             <p><strong>Complaint Notifications:</strong> Enabled (In-app notification badge & audit history)</p>
             <p><strong>Campus Scope:</strong> Engineering & Technology Campus</p>
-            <p><strong>Session Status:</strong> Active local demo session (Student role)</p>
+            <p><strong>Session Status:</strong> Active Authenticated Session (PostgreSQL backend)</p>
           </div>
         </section>
       </main>
     </div>
   </div>
 
+  <script src="../js/shared-data.js"></script>
+  <script>
+    function showProfileAlert(type, message) {
+      const alertBox = document.getElementById("profileAlert");
+      alertBox.style.display = "block";
+      if (type === "success") {
+        alertBox.style.background = "#ecfdf5";
+        alertBox.style.color = "#065f46";
+        alertBox.style.border = "1px solid #a7f3d0";
+      } else {
+        alertBox.style.background = "#fef2f2";
+        alertBox.style.color = "#991b1b";
+        alertBox.style.border = "1px solid #fecaca";
+      }
+      alertBox.textContent = message;
+      setTimeout(() => {
+        alertBox.style.display = "none";
+      }, 5000);
+    }
+
+    document.addEventListener("DOMContentLoaded", async function () {
+      ComplaintStore.updateBellBadge();
+      const user = await ComplaintStore.getCurrentUser();
+      if (user) {
+        if (user.fullName || user.name) document.getElementById("studentFullName").value = user.fullName || user.name;
+        if (user.email) document.getElementById("studentEmail").value = user.email;
+        if (user.role) document.getElementById("studentRole").value = user.role;
+        if (user.department || user.dept) document.getElementById("studentDept").value = user.department || user.dept;
+      }
+
+      document.getElementById("profileForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const newName = document.getElementById("studentFullName").value.trim();
+        const dept = document.getElementById("studentDept").value.trim();
+
+        if (!newName) {
+          showProfileAlert("error", "Name cannot be empty.");
+          return;
+        }
+
+        const saveBtn = document.getElementById("btnSaveProfile");
+        saveBtn.disabled = true;
+        saveBtn.querySelector("span").textContent = "Saving...";
+
+        try {
+          const res = await ComplaintStore.updateProfile(newName, dept);
+          showProfileAlert("success", res.message || "Profile name updated successfully!");
+        } catch (err) {
+          showProfileAlert("error", err.message || "Failed to update profile name.");
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.querySelector("span").textContent = "Save Changes";
+        }
+      });
+    });
+  </script>
 </body>
 </html>

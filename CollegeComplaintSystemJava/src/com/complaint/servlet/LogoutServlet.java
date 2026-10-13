@@ -39,7 +39,8 @@ public class LogoutServlet extends HttpServlet {
         }
 
         String accept = request.getHeader("Accept");
-        boolean isApiRequest = accept != null && accept.contains("application/json");
+        boolean isApiRequest = (accept != null && accept.contains("application/json"))
+                || "POST".equalsIgnoreCase(request.getMethod());
 
         if (isApiRequest) {
             response.setContentType("application/json");

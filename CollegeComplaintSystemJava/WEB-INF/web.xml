@@ -76,4 +76,43 @@
         <url-pattern>/api/logout</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>ComplaintServlet</servlet-name>
+        <servlet-class>com.complaint.servlet.ComplaintServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ComplaintServlet</servlet-name>
+        <url-pattern>/api/complaints</url-pattern>
+        <url-pattern>/api/complaints/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>StatsServlet</servlet-name>
+        <servlet-class>com.complaint.servlet.StatsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StatsServlet</servlet-name>
+        <url-pattern>/api/stats</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>NotificationServlet</servlet-name>
+        <servlet-class>com.complaint.servlet.NotificationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NotificationServlet</servlet-name>
+        <url-pattern>/api/notifications</url-pattern>
+        <url-pattern>/api/notifications/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>com.complaint.servlet.UserServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserServlet</servlet-name>
+        <url-pattern>/api/users</url-pattern>
+        <url-pattern>/api/users/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>

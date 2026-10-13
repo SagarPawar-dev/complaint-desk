@@ -173,8 +173,8 @@
 
   <script src="../js/shared-data.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      let studentEmail = "student@test.com";
+    document.addEventListener("DOMContentLoaded", async function () {
+      let studentEmail = "";
       try {
         const demoUser = JSON.parse(sessionStorage.getItem("demoUser"));
         if (demoUser && demoUser.name) {
@@ -185,57 +185,56 @@
         }
       } catch (e) {}
 
-      // Update Stats
-      const stats = ComplaintStore.getStats(studentEmail);
-      document.getElementById("statTotal").textContent = stats.total;
-      document.getElementById("statPending").textContent = stats.pending;
-      document.getElementById("statProgress").textContent = stats.progress;
-      document.getElementById("statResolved").textContent = stats.resolved;
+      try {
+        // Update Stats from live PostgreSQL
+        const stats = await ComplaintStore.getStats(studentEmail);
+        document.getElementById("statTotal").textContent = stats.total;
+        document.getElementById("statPending").textContent = stats.pending;
+        document.getElementById("statProgress").textContent = stats.progress;
+        document.getElementById("statResolved").textContent = stats.resolved;
 
-      // Update Notification Badge
-      const notifs = ComplaintStore.getNotifications("STUDENT", studentEmail);
-      const badge = document.querySelector(".notification-badge");
-      if (badge) {
-        badge.textContent = notifs.length;
-        if (notifs.length === 0) badge.style.display = "none";
-      }
+        // Update Notification Badge
+        ComplaintStore.updateBellBadge();
 
-      // Populate Recent Activity
-      const complaints = ComplaintStore.getStudentComplaints(studentEmail);
-      const listEl = document.getElementById("recentActivityList");
-      listEl.innerHTML = "";
+        // Populate Recent Activity from live PostgreSQL
+        const complaints = await ComplaintStore.getStudentComplaints(studentEmail);
+        const listEl = document.getElementById("recentActivityList");
+        listEl.innerHTML = "";
 
-      if (complaints.length === 0) {
-        listEl.innerHTML = '<p style="color:#64748b; font-size:14px; padding:10px 0;">No complaints recorded yet.</p>';
-        return;
-      }
-
-      // Show top 5 recent
-      complaints.slice(0, 5).forEach(c => {
-        let badgeClass = "badge-submitted";
-        let statusLabel = c.status;
-        if (c.status === "RESOLVED" || c.status === "CLOSED") {
-          badgeClass = "badge-closed";
-        } else if (c.status === "IN PROGRESS" || c.status === "IN_PROGRESS") {
-          badgeClass = "badge-in-progress";
+        if (!complaints || complaints.length === 0) {
+          listEl.innerHTML = '<p style="color:#64748b; font-size:14px; padding:10px 0;">No complaints recorded yet.</p>';
+          return;
         }
 
-        const item = document.createElement("div");
-        item.className = "activity-item";
-        item.style.cursor = "pointer";
-        item.title = "Click to view complaint details";
-        item.innerHTML = `
-          <div class="activity-info">
-            <h3>${c.title}</h3>
-            <div class="activity-meta">${c.id} &bull; ${c.submittedAt}</div>
-          </div>
-          <span class="status-badge ${badgeClass}">${statusLabel}</span>
-        `;
-        item.addEventListener("click", () => {
-          window.location.href = `complaint-details.html?id=${c.id}`;
+        // Show top 5 recent
+        complaints.slice(0, 5).forEach(c => {
+          let badgeClass = "badge-submitted";
+          let statusLabel = c.status;
+          if (c.status === "RESOLVED" || c.status === "CLOSED") {
+            badgeClass = "badge-closed";
+          } else if (c.status === "IN PROGRESS" || c.status === "IN_PROGRESS") {
+            badgeClass = "badge-in-progress";
+          }
+
+          const item = document.createElement("div");
+          item.className = "activity-item";
+          item.style.cursor = "pointer";
+          item.title = "Click to view complaint details";
+          item.innerHTML = `
+            <div class="activity-info">
+              <h3>${c.title}</h3>
+              <div class="activity-meta">${c.id} &bull; ${c.submittedAt}</div>
+            </div>
+            <span class="status-badge ${badgeClass}">${statusLabel}</span>
+          `;
+          item.addEventListener("click", () => {
+            window.location.href = `complaint-details.html?id=${c.id}`;
+          });
+          listEl.appendChild(item);
         });
-        listEl.appendChild(item);
-      });
+      } catch (err) {
+        console.error("Failed to load dashboard data:", err);
+      }
     });
   </script>
 </body>

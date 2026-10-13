@@ -103,6 +103,28 @@ public class NotificationDAO {
     }
 
     /**
+     * Marks a single notification as read with ownership/role validation.
+     */
+    public boolean markAsRead(long notificationId, int userId, String role) throws SQLException {
+        String sql;
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            sql = "UPDATE notifications SET is_read = TRUE WHERE id = ? AND recipient_role = 'ADMIN'";
+        } else {
+            sql = "UPDATE notifications SET is_read = TRUE WHERE id = ? AND user_id = ? AND recipient_role = 'STUDENT'";
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, notificationId);
+            if (!"ADMIN".equalsIgnoreCase(role)) {
+                stmt.setInt(2, userId);
+            }
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
      * Marks all notifications as read for a given user/role.
      */
     public int markAllAsRead(int userId, String role) throws SQLException {

@@ -106,6 +106,46 @@ public class UserDAO {
     }
 
     /**
+     * Updates account status (ACTIVE or INACTIVE).
+     */
+    public boolean updateStatus(int userId, String status) throws SQLException {
+        String sql = "UPDATE users SET status = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, userId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Updates password hash for a user.
+     */
+    public boolean updatePassword(int userId, String passwordHash) throws SQLException {
+        String sql = "UPDATE users SET password_hash = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, passwordHash);
+            stmt.setInt(2, userId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Updates profile details (full name and department).
+     */
+    public boolean updateProfile(int userId, String fullName, String department) throws SQLException {
+        String sql = "UPDATE users SET full_name = ?, department = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, fullName);
+            stmt.setString(2, department);
+            stmt.setInt(3, userId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
      * Helper method to map a ResultSet row to a User object.
      */
     private User mapRowToUser(ResultSet rs) throws SQLException {

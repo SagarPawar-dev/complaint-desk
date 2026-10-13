@@ -90,7 +90,7 @@
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
-            <span class="notification-badge">2</span>
+            <span class="notification-badge" style="display: none;">0</span>
           </button>
 
           <!-- User Profile Capsule -->
@@ -203,7 +203,7 @@
 
   <script src="../js/shared-data.js"></script>
   <script>
-    document.getElementById("reportComplaintForm").addEventListener("submit", function (e) {
+    document.getElementById("reportComplaintForm").addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const title = document.getElementById("complaintTitle").value.trim();
@@ -217,39 +217,42 @@
         return;
       }
 
-      // Read current logged in student info from sessionStorage if available
-      let studentEmail = "student@test.com";
-      let studentName = "Om Sharma";
+      const submitBtn = this.querySelector("button[type='submit']");
+      const originalBtnText = submitBtn ? submitBtn.textContent : "Submit Complaint";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+      }
+
       try {
-        const user = JSON.parse(sessionStorage.getItem("demoUser"));
-        if (user && user.email) {
-          studentEmail = user.email;
-          studentName = user.name || studentName;
+        // Save to real PostgreSQL database
+        const created = await ComplaintStore.createComplaint({
+          title: title,
+          category: category,
+          priority: priority,
+          location: location,
+          description: description
+        });
+
+        // Show success alert
+        const alertBox = document.getElementById("successAlert");
+        document.getElementById("successMessageDetail").innerHTML =
+          `Complaint ID <strong>${created.id}</strong> has been filed and saved to database.`;
+        alertBox.style.display = "flex";
+
+        // Reset form
+        document.getElementById("reportComplaintForm").reset();
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        alert("Failed to submit grievance: " + (err.message || "Please check backend connection."));
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
         }
-      } catch (err) {}
-
-      // Save via shared data module
-      const created = ComplaintStore.createComplaint({
-        title: title,
-        category: category,
-        priority: priority,
-        location: location,
-        description: description,
-        submittedBy: studentEmail,
-        studentName: studentName
-      });
-
-      // Show success alert
-      const alertBox = document.getElementById("successAlert");
-      document.getElementById("successMessageDetail").innerHTML =
-        `Complaint ID <strong>${created.id}</strong> has been filed and notified to the administrator.`;
-      alertBox.style.display = "flex";
-
-      // Reset form
-      document.getElementById("reportComplaintForm").reset();
-
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     });
   </script>
 </body>
