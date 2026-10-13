@@ -162,35 +162,6 @@
   gap: 20px;
 }
 
-.hero-tag-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #065f46;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 9999px;
-  width: fit-content;
-  letter-spacing: 0.02em;
-}
-
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #10b981;
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  animation: pulse-ring 2s infinite cubic-bezier(0.66, 0, 0, 1);
-}
-
-@keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
 
 .hero-headline {
   font-size: 44px;
@@ -1033,7 +1004,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   12. Responsive Adjustments
+   12. Responsive Adjustments Across Viewports (320px - 1440px)
    -------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
   .hero-grid {
@@ -1070,6 +1041,10 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .tracking-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .footer-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 36px;
@@ -1082,7 +1057,16 @@
   }
 
   .mobile-nav-toggle {
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+  }
+
+  .mobile-nav-toggle:hover {
+    background-color: #f1f5f9;
   }
 
   .landing-nav-links.mobile-open {
@@ -1096,32 +1080,298 @@
     border-bottom: 1px solid var(--color-border);
     padding: 20px 24px;
     gap: 16px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.12);
+    z-index: 1001;
+  }
+
+  .landing-nav-links.mobile-open a {
+    padding: 8px 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .hero-section {
+    padding: 48px 0 56px;
   }
 
   .hero-headline {
-    font-size: 32px;
+    font-size: 34px;
+  }
+
+  .hero-description {
+    font-size: 16px;
+  }
+
+  .section-wrapper {
+    padding: 60px 0;
+  }
+
+  .section-header-centered {
+    margin: 0 auto 40px;
+  }
+
+  .section-title {
+    font-size: 28px;
   }
 
   .metrics-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .workflow-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .features-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .tracking-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .cta-banner-section {
+    padding: 56px 0;
+  }
+
+  .cta-banner-card h2 {
+    font-size: 28px;
   }
 
   .footer-grid {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 32px;
   }
 
   .footer-bottom-row {
     flex-direction: column;
     text-align: center;
+    gap: 16px;
+  }
+
+  .footer-credits {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
   }
 }
+
+@media (max-width: 640px) {
+  .hero-cta-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .btn-hero-primary,
+  .btn-hero-secondary {
+    width: 100%;
+    justify-content: center;
+    height: 46px;
+  }
+
+  .cta-button-row {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-cta-portal {
+    width: 100%;
+    justify-content: center;
+    height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-container {
+    padding: 0 16px;
+  }
+
+  .landing-nav-inner {
+    height: 64px;
+  }
+
+  .landing-brand {
+    gap: 8px;
+  }
+
+  .brand-icon-box {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-icon-box svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .brand-title {
+    font-size: 16px;
+  }
+
+  .brand-badge {
+    display: none;
+  }
+
+  .nav-btn-signin {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+
+  .hero-section {
+    padding: 36px 0 44px;
+  }
+
+  .hero-headline {
+    font-size: 26px;
+    line-height: 1.22;
+  }
+
+  .hero-description {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .hero-feature-tags {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    padding-top: 14px;
+  }
+
+  .hero-tag-item {
+    font-size: 12px;
+  }
+
+  /* Authentic Ticket Mockup on Narrow Viewports */
+  .mockup-card-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mockup-body {
+    padding: 16px 14px;
+  }
+
+  .mockup-ticket-title {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .mockup-ticket-meta {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .mockup-ticket-desc {
+    padding: 10px 12px;
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .mockup-timeline {
+    padding-left: 18px;
+    gap: 10px;
+  }
+
+  .mockup-step-dot {
+    width: 12px;
+    height: 12px;
+    left: -18px;
+  }
+
+  .mockup-step-action {
+    font-size: 12px;
+  }
+
+  .mockup-step-note {
+    font-size: 10px;
+  }
+
+  .section-wrapper {
+    padding: 44px 0;
+  }
+
+  .section-header-centered {
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-size: 22px;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+  }
+
+  .workflow-card {
+    padding: 20px 16px;
+  }
+
+  .feature-box {
+    padding: 20px 16px;
+  }
+
+  .tracking-box {
+    padding: 20px 16px;
+  }
+
+  .cta-banner-section {
+    padding: 44px 0;
+  }
+
+  .cta-banner-card h2 {
+    font-size: 24px;
+  }
+
+  .cta-banner-card p {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .landing-footer {
+    padding: 48px 0 28px;
+  }
+
+  .footer-copyright {
+    font-size: 12px;
+  }
+
+  .footer-credits {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .landing-container {
+    padding: 0 10px;
+  }
+
+  .brand-title {
+    font-size: 15px;
+  }
+
+  .hero-headline {
+    font-size: 22px;
+  }
+
+  .mockup-body {
+    padding: 14px 10px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .cta-banner-card h2 {
+    font-size: 21px;
+  }
+}
+

@@ -484,5 +484,87 @@ if (typeof document !== "undefined") {
     });
 
     ComplaintStore.updateBellBadge();
+
+    // Auto-mount mobile sidebar toggle and backdrop
+    const sidebar = document.querySelector(".sidebar");
+    const topHeader = document.querySelector(".top-header");
+    if (sidebar && topHeader) {
+      // Backdrop element
+      let backdrop = document.querySelector(".sidebar-backdrop");
+      if (!backdrop) {
+        backdrop = document.createElement("div");
+        backdrop.className = "sidebar-backdrop";
+        document.body.appendChild(backdrop);
+      }
+
+      // Close button inside sidebar brand
+      const brand = sidebar.querySelector(".sidebar-brand");
+      if (brand && !brand.querySelector(".sidebar-close-btn")) {
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "sidebar-close-btn";
+        closeBtn.setAttribute("type", "button");
+        closeBtn.setAttribute("aria-label", "Close navigation menu");
+        closeBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        `;
+        closeBtn.addEventListener("click", () => {
+          sidebar.classList.remove("mobile-open");
+          backdrop.classList.remove("active");
+          document.body.classList.remove("sidebar-locked");
+        });
+        brand.appendChild(closeBtn);
+      }
+
+      // Hamburger button in top-header
+      if (!topHeader.querySelector(".mobile-menu-btn")) {
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = "mobile-menu-btn";
+        toggleBtn.setAttribute("type", "button");
+        toggleBtn.setAttribute("aria-label", "Open navigation menu");
+        toggleBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        `;
+        toggleBtn.addEventListener("click", () => {
+          sidebar.classList.toggle("mobile-open");
+          backdrop.classList.toggle("active");
+          document.body.classList.toggle("sidebar-locked");
+        });
+        topHeader.insertBefore(toggleBtn, topHeader.firstChild);
+      }
+
+      // Backdrop click closes sidebar
+      backdrop.addEventListener("click", () => {
+        sidebar.classList.remove("mobile-open");
+        backdrop.classList.remove("active");
+        document.body.classList.remove("sidebar-locked");
+      });
+
+      // Nav item clicks on mobile close drawer
+      sidebar.querySelectorAll(".nav-item").forEach(item => {
+        item.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove("mobile-open");
+            backdrop.classList.remove("active");
+            document.body.classList.remove("sidebar-locked");
+          }
+        });
+      });
+
+      // Escape key closes drawer
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && sidebar.classList.contains("mobile-open")) {
+          sidebar.classList.remove("mobile-open");
+          backdrop.classList.remove("active");
+          document.body.classList.remove("sidebar-locked");
+        }
+      });
+    }
   });
 }

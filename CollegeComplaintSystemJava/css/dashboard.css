@@ -128,6 +128,69 @@
   min-height: 100vh;
 }
 
+/* Mobile Drawer Toggle & Overlay */
+.mobile-menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--color-text-main);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  min-width: 44px;
+  min-height: 44px;
+  transition: background-color 0.15s ease;
+}
+
+.mobile-menu-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-close-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--color-sidebar-text);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-left: auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  transition: all 0.15s ease;
+}
+
+.sidebar-close-btn:hover {
+  color: #ffffff;
+  background-color: var(--color-sidebar-hover);
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1040;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.sidebar-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.sidebar-locked {
+  overflow: hidden;
+}
+
 /* Top Navigation Bar */
 .top-header {
   height: 72px;
@@ -427,30 +490,7 @@
   color: #c2410c;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 
-@media (max-width: 768px) {
-  .sidebar {
-    width: 70px;
-  }
-  .sidebar-brand h2,
-  .sidebar-section-title,
-  .nav-item span,
-  .btn-logout span {
-    display: none;
-  }
-  .main-wrapper {
-    margin-left: 70px;
-  }
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* --------------------------------------------------------------------------
    Data Tables (Complaints & User Management)
@@ -895,5 +935,383 @@
   border: 1px solid #bae6fd;
   color: #075985;
 }
+
+/* ==========================================================================
+   Responsive Adjustments Across Screen Sizes (320px - 1440px)
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .main-wrapper {
+    margin-left: 240px;
+  }
+
+  .sidebar {
+    width: 240px;
+  }
+
+  .top-header {
+    padding: 0 24px;
+  }
+
+  .page-content {
+    padding: 16px 24px 36px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .details-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Mobile Sidebar Drawer Pattern */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 280px;
+    max-width: 82vw;
+    z-index: 1050;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: 12px 0 32px rgba(0, 0, 0, 0.45);
+  }
+
+  .sidebar-brand {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sidebar-close-btn {
+    display: inline-flex;
+  }
+
+  /* Keep all sidebar nav items readable and properly sized in mobile drawer */
+  .sidebar-brand h2,
+  .sidebar-section-title,
+  .nav-item span,
+  .btn-logout span {
+    display: inline !important;
+  }
+
+  .nav-item {
+    min-height: 44px;
+    padding: 12px 14px;
+  }
+
+  .btn-logout {
+    min-height: 44px;
+    padding: 12px 14px;
+  }
+
+  /* Main Wrapper Takes Full 100% Screen Width */
+  .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Top Navigation Bar on Mobile */
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
+
+  .top-header {
+    height: auto;
+    min-height: 64px;
+    padding: 8px 16px;
+    gap: 12px;
+  }
+
+  .header-title-block h1 {
+    font-size: 20px;
+  }
+
+  .header-title-block p {
+    font-size: 12px;
+  }
+
+  .header-actions {
+    gap: 12px;
+  }
+
+  .notification-bell-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Page Content Container */
+  .page-content {
+    padding: 14px 16px 32px;
+    gap: 18px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px 18px;
+  }
+
+  .stat-card-value {
+    font-size: 28px;
+    margin: 8px 0 4px;
+  }
+
+  /* Filter & Search Bar */
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .search-input,
+  .filter-select {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  /* Data Tables with Contained Horizontal Scroll */
+  .data-table-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    min-width: 620px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  /* Action Buttons inside Tables */
+  .btn-sm-action {
+    min-height: 38px;
+    padding: 6px 12px;
+  }
+
+  /* Forms & Modals */
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .form-group-full {
+    grid-column: span 1;
+  }
+
+  .section-card {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 540px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .action-banner-row {
+    justify-content: stretch;
+  }
+
+  .btn-report-complaint {
+    width: 100%;
+    height: 44px;
+    justify-content: center;
+  }
+
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 16px;
+  }
+
+  .activity-info h3 {
+    font-size: 14px;
+  }
+
+  .notification-card-item {
+    padding: 14px 14px;
+    gap: 12px;
+  }
+
+  .notification-content h4 {
+    font-size: 13px;
+  }
+
+  .notification-content p {
+    font-size: 12px;
+  }
+
+  .form-actions-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    width: 100%;
+    height: 44px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-header {
+    padding: 6px 12px;
+    min-height: 58px;
+  }
+
+  .mobile-menu-btn {
+    margin-right: 6px;
+  }
+
+  .header-title-block h1 {
+    font-size: 18px;
+  }
+
+  .header-title-block p {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+
+  /* Show only Avatar Circle to conserve horizontal header space */
+  .user-profile-capsule .user-info,
+  .user-profile-capsule .chevron-icon {
+    display: none;
+  }
+
+  .avatar-circle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .page-content {
+    padding: 12px 10px 24px;
+    gap: 14px;
+  }
+
+  .section-card {
+    padding: 16px 12px;
+    border-radius: var(--radius-sm);
+  }
+
+  .section-card-header h2 {
+    font-size: 15px;
+  }
+
+  .stat-card {
+    padding: 14px 16px;
+  }
+
+  .stat-card-value {
+    font-size: 26px;
+  }
+
+  /* Timeline on narrow mobile */
+  .timeline-container {
+    padding-left: 22px;
+  }
+
+  .timeline-marker {
+    left: -22px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .timeline-container::before {
+    left: 5px;
+  }
+
+  .timeline-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .timeline-title {
+    font-size: 13px;
+  }
+
+  .timeline-body {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  /* Alert Banners */
+  .alert-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .alert-banner .btn-sm-action {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .top-header {
+    padding: 4px 8px;
+  }
+
+  .header-title-block p {
+    display: none;
+  }
+
+  .page-content {
+    padding: 10px 6px 20px;
+  }
+
+  .section-card {
+    padding: 14px 10px;
+  }
+
+  .stat-card {
+    padding: 12px 12px;
+  }
+}
+
 
 
