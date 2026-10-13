@@ -3,6 +3,9 @@ package com.complaint.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -14,7 +17,7 @@ import java.util.Properties;
  * College Complaint Management System - Database Connection Utility
  * ==============================================================================
  * Manages JDBC connections to Supabase PostgreSQL.
- * Reads credentials securely from WEB-INF/db.properties.
+ * Reads credentials securely from WEB-INF/db.properties or environment variables.
  *
  * Beginner-friendly:
  * - Simple static methods
@@ -36,18 +39,82 @@ public class DBConnection {
     }
 
     /**
-     * Loads database configuration from db.properties.
-     * Looks in the classpath first, then falls back to local file paths.
+     * Loads database configuration from environment variables or db.properties.
+     * Checks DB_URL / DATABASE_URL first, then falls back to db.properties.
      */
     private static synchronized void loadProperties() {
         // 1. Priority: Check Environment Variables (Render, Container, Cloud Deployments)
-        String envUrl = System.getenv("DB_URL");
-        String envUser = System.getenv("DB_USER");
-        String envPassword = System.getenv("DB_PASSWORD");
-        String envDriver = System.getenv("DB_DRIVER");
+        String envUrl = getFirstEnv("DB_URL", "DATABASE_URL");
+        String envUser = getFirstEnv("DB_USER", "DATABASE_USER", "DB_USERNAME");
+        String envPassword = getFirstEnv("DB_PASSWORD", "DATABASE_PASSWORD", "DB_PASS");
+        String envDriver = getFirstEnv("DB_DRIVER", "DATABASE_DRIVER");
 
         if (envUrl != null && !envUrl.trim().isEmpty()) {
-            dbUrl = envUrl.trim();
+            envUrl = envUrl.trim();
+
+            // Auto-parse full URI format: postgresql://[user]:[password]@[host]:[port]/[database]
+            // or postgres://... or jdbc:postgresql://...
+            if (envUrl.startsWith("postgres://") || envUrl.startsWith("postgresql://") || envUrl.startsWith("jdbc:postgres://") || envUrl.startsWith("jdbc:postgresql://")) {
+                try {
+                    String rawUri = envUrl;
+                    if (rawUri.startsWith("jdbc:")) {
+                        rawUri = rawUri.substring(5);
+                    }
+                    if (rawUri.startsWith("postgres://")) {
+                        rawUri = "postgresql://" + rawUri.substring(11);
+                    }
+
+                    URI uri = new URI(rawUri);
+                    String userInfo = uri.getUserInfo();
+                    if (userInfo != null && !userInfo.isEmpty()) {
+                        String[] parts = userInfo.split(":", 2);
+                        if ((envUser == null || envUser.isEmpty()) && parts.length > 0) {
+                            envUser = URLDecoder.decode(parts[0], StandardCharsets.UTF_8.name());
+                        }
+                        if ((envPassword == null || envPassword.isEmpty()) && parts.length > 1) {
+                            envPassword = URLDecoder.decode(parts[1], StandardCharsets.UTF_8.name());
+                        }
+                    }
+
+                    int port = uri.getPort() > 0 ? uri.getPort() : 5432;
+                    String path = uri.getPath();
+                    if (path == null || path.isEmpty() || path.equals("/")) {
+                        path = "/postgres";
+                    }
+
+                    String query = uri.getQuery();
+                    StringBuilder jdbcBuilder = new StringBuilder();
+                    jdbcBuilder.append("jdbc:postgresql://").append(uri.getHost()).append(":").append(port).append(path);
+                    if (query != null && !query.isEmpty()) {
+                        if (!query.contains("sslmode=")) {
+                            jdbcBuilder.append("?").append(query).append("&sslmode=require");
+                        } else {
+                            jdbcBuilder.append("?").append(query);
+                        }
+                    } else {
+                        jdbcBuilder.append("?sslmode=require");
+                    }
+                    envUrl = jdbcBuilder.toString();
+                } catch (Exception ex) {
+                    if (!envUrl.startsWith("jdbc:")) {
+                        if (envUrl.startsWith("postgres://")) {
+                            envUrl = "jdbc:postgresql://" + envUrl.substring(11);
+                        } else {
+                            envUrl = "jdbc:" + envUrl;
+                        }
+                    }
+                    if (!envUrl.contains("sslmode=")) {
+                        envUrl += (envUrl.contains("?") ? "&" : "?") + "sslmode=require";
+                    }
+                }
+            } else if (!envUrl.startsWith("jdbc:")) {
+                envUrl = "jdbc:postgresql://" + envUrl;
+                if (!envUrl.contains("sslmode=")) {
+                    envUrl += (envUrl.contains("?") ? "&" : "?") + "sslmode=require";
+                }
+            }
+
+            dbUrl = envUrl;
             dbUser = (envUser != null) ? envUser.trim() : "";
             dbPassword = (envPassword != null) ? envPassword.trim() : "";
             dbDriver = (envDriver != null && !envDriver.trim().isEmpty()) ? envDriver.trim() : "org.postgresql.Driver";
@@ -55,7 +122,9 @@ public class DBConnection {
             try {
                 Class.forName(dbDriver);
                 isInitialized = true;
-                System.out.println("[DBConnection] Configured database from environment variables (DB_URL).");
+                System.out.println("[DBConnection] Configured database from environment variables.");
+                System.out.println("[DBConnection] Target URL : " + dbUrl);
+                System.out.println("[DBConnection] Target User: " + (dbUser.isEmpty() ? "(not set)" : dbUser));
                 return;
             } catch (ClassNotFoundException e) {
                 System.err.println("[DBConnection] ERROR: PostgreSQL JDBC Driver class not found: " + dbDriver);
@@ -191,6 +260,19 @@ public class DBConnection {
                 System.err.println("[DBConnection] Error closing connection: " + e.getMessage());
             }
         }
+    }
+
+    /**
+     * Helper to return the first non-empty environment variable value among candidate names.
+     */
+    private static String getFirstEnv(String... names) {
+        for (String name : names) {
+            String val = System.getenv(name);
+            if (val != null && !val.trim().isEmpty()) {
+                return val.trim();
+            }
+        }
+        return null;
     }
 
     /**
