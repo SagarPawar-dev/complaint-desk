@@ -173,8 +173,10 @@
 
 .hero-headline span.accent-text {
   background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .hero-description {
