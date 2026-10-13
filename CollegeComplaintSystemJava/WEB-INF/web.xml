@@ -8,8 +8,8 @@
     <display-name>College Complaint Management System</display-name>
 
     <welcome-file-list>
-        <welcome-file>login.html</welcome-file>
         <welcome-file>index.html</welcome-file>
+        <welcome-file>login.html</welcome-file>
     </welcome-file-list>
 
     <!-- Session Timeout (30 minutes) -->
