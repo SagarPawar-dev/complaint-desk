@@ -1,0 +1,16 @@
+**/.git
+**/.github
+**/.vscode
+**/.idea
+**/*.iml
+.project
+.classpath
+.settings
+*.log
+**/db.properties
+db.properties
+*.env
+**/.tempmediaStorage
+scratch/
+**/test-db.jsp
+test-db.jsp

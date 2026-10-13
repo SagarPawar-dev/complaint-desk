@@ -40,17 +40,42 @@ public class DBConnection {
      * Looks in the classpath first, then falls back to local file paths.
      */
     private static synchronized void loadProperties() {
+        // 1. Priority: Check Environment Variables (Render, Container, Cloud Deployments)
+        String envUrl = System.getenv("DB_URL");
+        String envUser = System.getenv("DB_USER");
+        String envPassword = System.getenv("DB_PASSWORD");
+        String envDriver = System.getenv("DB_DRIVER");
+
+        if (envUrl != null && !envUrl.trim().isEmpty()) {
+            dbUrl = envUrl.trim();
+            dbUser = (envUser != null) ? envUser.trim() : "";
+            dbPassword = (envPassword != null) ? envPassword.trim() : "";
+            dbDriver = (envDriver != null && !envDriver.trim().isEmpty()) ? envDriver.trim() : "org.postgresql.Driver";
+
+            try {
+                Class.forName(dbDriver);
+                isInitialized = true;
+                System.out.println("[DBConnection] Configured database from environment variables (DB_URL).");
+                return;
+            } catch (ClassNotFoundException e) {
+                System.err.println("[DBConnection] ERROR: PostgreSQL JDBC Driver class not found: " + dbDriver);
+                System.err.println("[DBConnection] Verify that 'postgresql-42.7.3.jar' is present in WEB-INF/lib.");
+                return;
+            }
+        }
+
+        // 2. Fallback: Load from db.properties for local development
         Properties props = new Properties();
         InputStream input = null;
 
         try {
-            // 1. Try loading from ClassLoader (Tomcat WEB-INF/classes or classpath)
+            // A. Try loading from ClassLoader (Tomcat WEB-INF/classes or classpath)
             input = DBConnection.class.getClassLoader().getResourceAsStream("db.properties");
             if (input == null) {
                 input = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties");
             }
 
-            // 2. Try locating WEB-INF/db.properties relative to compiled class location (Tomcat WebApp)
+            // B. Try locating WEB-INF/db.properties relative to compiled class location (Tomcat WebApp)
             if (input == null) {
                 try {
                     java.net.URL location = DBConnection.class.getProtectionDomain().getCodeSource().getLocation();
@@ -68,7 +93,7 @@ public class DBConnection {
                 }
             }
 
-            // 3. Fallback: Search common file paths for standalone main() execution
+            // C. Fallback: Search common file paths for standalone main() execution
             if (input == null) {
                 String[] candidatePaths = {
                     "WEB-INF/db.properties",
@@ -88,8 +113,8 @@ public class DBConnection {
             }
 
             if (input == null) {
-                System.err.println("[DBConnection] ERROR: 'db.properties' could not be found.");
-                System.err.println("[DBConnection] Please make sure WEB-INF/db.properties exists.");
+                System.err.println("[DBConnection] ERROR: Neither DB_URL environment variable nor 'db.properties' was found.");
+                System.err.println("[DBConnection] Please provide DB_URL, DB_USER, DB_PASSWORD environment variables or WEB-INF/db.properties.");
                 return;
             }
 
